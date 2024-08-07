@@ -1,9 +1,9 @@
 import { ChangeEvent } from "react";
 export type Difficulties = {
-  foundation?: boolean;
-  crossover?: boolean;
-  higher?: boolean;
-  extended?: boolean;
+  foundation: boolean;
+  crossover: boolean;
+  higher: boolean;
+  extended: boolean;
 };
 type DifficultySelectorsProps = {
   difficulties: Difficulties;

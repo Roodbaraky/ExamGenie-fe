@@ -4,7 +4,13 @@ import DifficultySelectors, { Difficulties } from "./DifficultySelectors";
 
 export default function QuestionsForm() {
   const initialTags: string[] = [];
-  const initialDifficulties: Difficulties = {};
+  const initialDifficulties: Difficulties = {
+    foundation: false,
+    crossover: false,
+    higher: false,
+    extended: false,
+  };
+
   const [tags, setTags] = useState(initialTags);
   const [difficulties, setDifficulties] = useState(initialDifficulties);
 
@@ -23,7 +29,15 @@ export default function QuestionsForm() {
           setDifficulties={setDifficulties}
         />
       </div>
-      <div className="self-center text-2xl btn">Generate</div>
+      <div
+        className="self-center text-2xl btn"
+        onClick={(e) => {
+          e.preventDefault();
+          //Generate PDF of questions which match filters
+        }}
+      >
+        Generate
+      </div>
     </form>
   );
 }
