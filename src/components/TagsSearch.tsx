@@ -23,7 +23,7 @@ export default function TagsSearch({ tags, setTags }: TagSearchProps) {
               const searchTerm = (
                 document.getElementById("search-field") as HTMLInputElement
               ).value;
-              if (searchTerm.length && e.key === "Enter") {
+              if (searchTerm.length && e.key === "Enter" && !tags.includes(searchTerm)) {
                 setTags([...tags, searchTerm]);
                 (
                   document.getElementById("search-field") as HTMLInputElement
