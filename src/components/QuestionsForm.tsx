@@ -1,4 +1,3 @@
-import { DevTool } from "@hookform/devtools";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import CrossIcon from "./CrossIcon";
@@ -15,6 +14,7 @@ interface FormValues {
   tags: string[];
   contentType: string;
   quantity: number;
+  recallPeriod: number;
 }
 
 export default function QuestionsForm() {
@@ -43,10 +43,11 @@ export default function QuestionsForm() {
       tags: [],
       contentType: "",
       quantity: 1,
+      recallPeriod: 1,
     },
   });
 
-  const { register, control, handleSubmit, setValue } = form;
+  const { register, handleSubmit, setValue } = form;
 
   const onSubmit = (data: FormValues) => {
     console.log("Submitted Data:", data);
@@ -143,6 +144,18 @@ export default function QuestionsForm() {
               <h2 className="text-2xl">Quantity</h2>
               <label htmlFor="quantity"></label>
               <input type="number" id="quantity" {...register("quantity")} />
+            </div>
+            <div>
+              <h2 className="text-2xl">Recall Period</h2>
+              <label htmlFor="recall"></label>
+              <select id="recall" {...register("recallPeriod")}>
+                {Array.from(Array(39).keys()).map((key) => (
+                  <option key={key} value={+key + 1}>
+                    {+key + 1}
+                  </option>
+                ))}
+              </select>
+              Week/s
             </div>
           </div>
           <div className="flex flex-col self-end">
