@@ -13,11 +13,18 @@ interface FormValues {
   difficulties: Record<string, boolean>;
   search: "";
   tags: string[];
+  contentType: string;
 }
 
 export default function QuestionsForm() {
   const difficulties = ["foundation", "crossover", "higher", "extended"];
-  const [tags, setTags] = useState([]);
+  const contentTypes = {
+    "1QSTR": "One Question Starter Slides",
+    "4QSTR": "Four Question Starter Slides",
+    FPA: "Full Page Assessment",
+    HPA: "Half Page Assessment",
+  };
+  const [tags, setTags] = useState<string[]>([]);
   const [classes, setClasses] = useState<Class[] | []>([]);
 
   const form = useForm<FormValues>({
@@ -31,8 +38,10 @@ export default function QuestionsForm() {
         return acc;
       }, {} as Record<string, boolean>),
       tags: [],
+      contentType: "",
     },
   });
+
   const { register, control, handleSubmit, setValue } = form;
 
   const onSubmit = async (data: FormValues) => {
@@ -48,16 +57,14 @@ export default function QuestionsForm() {
       if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
       }
-
       const returnedData = await response.json();
-      console.log('returnedData: ', returnedData);
+      console.log("returnedData: ", returnedData);
     } catch (error) {
       console.error((error as Error).message);
     }
   };
 
   useEffect(() => {
-    console.log("useEffect checker");
     populateClasses();
   }, []);
 
@@ -100,17 +107,32 @@ export default function QuestionsForm() {
               {classes.map((classItem) => (
                 <div key={classItem.id}>
                   <label htmlFor={classItem.class_name}>
-                    {classItem?.class_name}
+                    {classItem.class_name}
                   </label>
                   <input
                     type="checkbox"
-                    id={classItem?.class_name}
-                    {...register(`classes.${classItem?.class_name}`)}
+                    id={classItem.class_name}
+                    {...register(`classes.${classItem.class_name}`)}
                   />
                 </div>
               ))}
             </div>
-            <h2 className="text-2xl">Content Type</h2>
+            <div>
+              <h2 className="text-2xl">Content Type</h2>
+              {Object.entries(contentTypes).map(([code, name]) => (
+                <div key={code}>
+                  <label htmlFor={code}>
+                    {name}
+                  </label>
+                  <input
+                    type="radio"
+                    id={code}
+                    value={code}
+                    {...register("contentType")}
+                  />
+                </div>
+              ))}
+            </div>
             <h2 className="text-2xl">Quantity</h2>
           </div>
           <div className="flex flex-col self-end">
@@ -122,7 +144,7 @@ export default function QuestionsForm() {
                   type="text"
                   id="search"
                   onKeyDown={(e) => {
-                    const searchTerm = (
+                    const searchTerm: string = (
                       document.getElementById("search") as HTMLInputElement
                     ).value;
 
@@ -140,7 +162,7 @@ export default function QuestionsForm() {
                   }}
                 />
                 <div className="flex flex-wrap max-w-56">
-                  {tags.map((tag: string, index) => (
+                  {tags.map((tag: string) => (
                     <a key={tag} className="badge">
                       <CrossIcon
                         onClick={() => {
