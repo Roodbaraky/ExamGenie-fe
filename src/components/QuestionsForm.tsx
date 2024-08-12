@@ -12,7 +12,7 @@ export interface Class {
   sow_id: number;
 }
 export interface FormValues {
-  class: string;
+  className: string;
   difficulties: Record<string, boolean>;
   search: "";
   tags: string[];
@@ -34,7 +34,7 @@ export default function QuestionsForm() {
 
   const form = useForm<FormValues>({
     defaultValues: {
-      class: "",
+      className: "",
       difficulties: {},
       tags: [],
       contentType: "",
@@ -50,7 +50,7 @@ export default function QuestionsForm() {
     const postFilters = async () => {
       try {
         let apiURl = `http://127.0.0.1:3001/questions`;
-        if (+data.quantity > 1) apiURl += `?limit=${data.quantity}`;
+        if (+data.quantity >= 1) apiURl += `?limit=${data.quantity}`;
         const response = await fetch(apiURl, {
           method: "POST",
           headers: {

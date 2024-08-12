@@ -18,10 +18,11 @@ export default function ClassSelector({
           <div key={classItem.id}>
             <label htmlFor={classItem.class_name}>{classItem.class_name}</label>
             <input
+              required
               type="radio"
               id={classItem.class_name}
               value={classItem.class_name}
-              {...register(`class`)}
+              {...register(`className`)}
             />
           </div>
         ))}

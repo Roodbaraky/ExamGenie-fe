@@ -16,6 +16,7 @@ export const ContentTypeSelector = ({
       <div key={code}>
         <label htmlFor={code}>{name}</label>
         <input
+          required
           type="radio"
           id={code}
           value={code}
