@@ -1,45 +1,29 @@
-import { ChangeEvent, useEffect } from "react";
+import { UseFormRegister } from "react-hook-form";
+import { FormValues } from "./QuestionsForm";
 import { Class } from "./QuestionsFormOld";
 
 interface ClassSelectorProps {
   classes: Class[];
-  selectedClasses: Record<string, boolean>;
-  setSelectedClasses: (selectedClasses: Record<string, boolean>) => void;
+  register: UseFormRegister<FormValues>;
 }
 export default function ClassSelector({
   classes,
-  selectedClasses,
-  setSelectedClasses,
+  register,
 }: ClassSelectorProps) {
-  const handleSelectedClassesChange = (
-    event: ChangeEvent<HTMLInputElement>
-  ) => {
-    const { name, checked } = event.target;
-    setSelectedClasses({
-      ...selectedClasses,
-      [name]: checked,
-    });
-  };
-
-  useEffect(() => {
-    console.log(selectedClasses);
-  
-  }, [selectedClasses]);
-
   return (
-    <div>
-      Classes
+    <div className="flex flex-col justify-evenly">
+      <h2 className="text-2xl">Classes</h2>
       <div className="flex gap-1">
         {classes.map((classItem) => (
-          <label key={classItem.id}>
-            {classItem?.class_name}
+          <div key={classItem.id}>
+            <label htmlFor={classItem.class_name}>{classItem.class_name}</label>
             <input
-              type="checkbox"
-              name={classItem?.class_name}
-              checked={selectedClasses?.class_name}
-              onChange={handleSelectedClassesChange}
+              type="radio"
+              id={classItem.class_name}
+              value={classItem.class_name}
+              {...register(`class`)}
             />
-          </label>
+          </div>
         ))}
       </div>
     </div>
