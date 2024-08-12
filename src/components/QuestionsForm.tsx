@@ -8,7 +8,7 @@ export interface Class {
   sow_id: number;
 }
 interface FormValues {
-  classes: Record<string, boolean>;
+  class: string;
   difficulties: Record<string, boolean>;
   search: "";
   tags: string[];
@@ -119,9 +119,10 @@ export default function QuestionsForm() {
                     {classItem.class_name}
                   </label>
                   <input
-                    type="checkbox"
+                    type="radio"
                     id={classItem.class_name}
-                    {...register(`classes.${classItem.class_name}`)}
+                    value={classItem.class_name}
+                    {...register(`class`)}
                   />
                 </div>
               ))}
