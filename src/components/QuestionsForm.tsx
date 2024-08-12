@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { TagsSearch } from "./TagsSearch";
+import ClassSelector from "./ClassSelector";
+import { ContentTypeSelector } from "./ContentTypeSelector";
 import { DifficultySelector } from "./DifficultySelectors";
 import QuantitySelector from "./QuantitySelector";
 import RecallPeriodSelector from "./RecallPeriodSelector";
-import { ContentTypeSelector } from "./ContentTypeSelector";
-import ClassSelector from "./ClassSelector";
-
+import { TagsSearch } from "./TagsSearch";
 export interface Class {
   id: number;
   class_name: string;
@@ -50,7 +49,9 @@ export default function QuestionsForm() {
     console.log("Submitted Data:", data);
     const postFilters = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:3001/questions`, {
+        let apiURl = `http://127.0.0.1:3001/questions`;
+        if (+data.quantity > 1) apiURl += `?limit=${data.quantity}`;
+        const response = await fetch(apiURl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

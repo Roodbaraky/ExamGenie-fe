@@ -1,6 +1,6 @@
 import { UseFormRegister } from "react-hook-form";
 import { FormValues } from "./QuestionsForm";
-import { Class } from "./QuestionsFormOld";
+import { Class } from "./QuestionsForm";
 
 interface ClassSelectorProps {
   classes: Class[];
