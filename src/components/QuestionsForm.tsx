@@ -46,7 +46,7 @@ export default function QuestionsForm() {
     },
   });
 
-  const { register, control, handleSubmit } = form;
+  const { register, control, handleSubmit, setValue } = form;
 
   const onSubmit = (data: FormValues) => {
     console.log("Submitted Data:", data);
@@ -75,6 +75,10 @@ export default function QuestionsForm() {
     populateClasses();
   }, []);
 
+  useEffect(() => {
+    console.log("useEffect checker 2");
+    setValue("tags", tags);
+  }, [tags, setValue]);
 
   function removeTag(tags: string[], tag: string) {
     const index = tags.indexOf(tag);
@@ -206,7 +210,6 @@ export default function QuestionsForm() {
           </div>
         </section>
       </form>
-      <DevTool control={control} />
     </>
   );
 }
