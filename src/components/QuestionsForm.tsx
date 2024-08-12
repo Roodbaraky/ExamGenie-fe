@@ -1,57 +1,179 @@
-import { useState } from "react";
-import DifficultySelectors, { Difficulties } from "./DifficultySelectors";
-import TagsSearch from "./TagsSearch";
+import { DevTool } from "@hookform/devtools";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import CrossIcon from "./CrossIcon";
+
+export interface Class {
+  id: number;
+  class_name: string;
+  sow_id: number;
+}
+interface FormValues {
+  classes: Record<string, boolean>;
+  difficulties: Record<string, boolean>;
+  search: "";
+  tags: string[];
+}
 
 export default function QuestionsForm() {
-  const initialTags: string[] = [];
-  const initialDifficulties: Difficulties = {
-    foundation: false,
-    crossover: false,
-    higher: false,
-    extended: false,
-  };
+  const difficulties = ["foundation", "crossover", "higher", "extended"];
+  const [tags, setTags] = useState([]);
+  const [classes, setClasses] = useState<Class[] | []>([]);
 
-  const [tags, setTags] = useState(initialTags);
-  const [difficulties, setDifficulties] = useState(initialDifficulties);
-  const handleSubmit = async () => {
+  const form = useForm<FormValues>({
+    defaultValues: {
+      classes: classes.reduce((acc, classItem) => {
+        acc[classItem.class_name] = false;
+        return acc;
+      }, {} as Record<string, boolean>),
+      difficulties: difficulties.reduce((acc, difficulty) => {
+        acc[difficulty] = false;
+        return acc;
+      }, {} as Record<string, boolean>),
+      tags: [],
+    },
+  });
+  const { register, control, handleSubmit, setValue } = form;
+
+  const onSubmit = async (data: FormValues) => {
+    console.log("Submitted Data:", data);
     try {
       const response = await fetch(`http://127.0.0.1:3001/questions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ tags, difficulties }),
+        body: JSON.stringify(data),
       });
       if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
       }
 
-      const json = await response.json();
-      console.log(json);
+      const returnedData = await response.json();
+      console.log('returnedData: ', returnedData);
+    } catch (error) {
+      console.error((error as Error).message);
+    }
+  };
+
+  useEffect(() => {
+    console.log("useEffect checker");
+    populateClasses();
+  }, []);
+
+  useEffect(() => {
+    setValue("tags", tags);
+  }, [tags, setValue]);
+
+  function removeTag(tags: string[], tag: string) {
+    const index = tags.indexOf(tag);
+    if (index === -1) return tags;
+
+    return [...tags.slice(0, index), ...tags.slice(index + 1)];
+  }
+
+  const populateClasses = async () => {
+    try {
+      const response = await fetch(`http://127.0.0.1:3001/classes`);
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+      const classes = await response.json();
+      setClasses(classes);
     } catch (error) {
       console.error((error as Error).message);
     }
   };
 
   return (
-    <form
-      action=""
-      id="form"
-      className="flex flex-col"
-      onSubmit={(e) => {
-        e.preventDefault();
-      }}
-    >
-      <div className="flex self-end">
-        <TagsSearch tags={tags} setTags={setTags} />
-        <DifficultySelectors
-          difficulties={difficulties}
-          setDifficulties={setDifficulties}
-        />
-      </div>
-      <div className="self-center text-2xl btn" onClick={handleSubmit}>
-        Generate
-      </div>
-    </form>
+    <>
+      <form
+        action=""
+        id="form"
+        className="flex flex-col gap-8"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <section id="controls" className="flex justify-evenly gap-4">
+          <div className="flex flex-col justify-evenly">
+            <h2 className="text-2xl">Classes</h2>
+            <div className="flex gap-1">
+              {classes.map((classItem) => (
+                <div key={classItem.id}>
+                  <label htmlFor={classItem.class_name}>
+                    {classItem?.class_name}
+                  </label>
+                  <input
+                    type="checkbox"
+                    id={classItem?.class_name}
+                    {...register(`classes.${classItem?.class_name}`)}
+                  />
+                </div>
+              ))}
+            </div>
+            <h2 className="text-2xl">Content Type</h2>
+            <h2 className="text-2xl">Quantity</h2>
+          </div>
+          <div className="flex flex-col self-end">
+            <div className="flex flex-col px-4">
+              <h2 className="text-2xl">Tags</h2>
+              <div className="flex flex-col gap-3 p-2">
+                <label htmlFor="search">Search</label>
+                <input
+                  type="text"
+                  id="search"
+                  onKeyDown={(e) => {
+                    const searchTerm = (
+                      document.getElementById("search") as HTMLInputElement
+                    ).value;
+
+                    if (
+                      searchTerm.length &&
+                      e.key === "Enter" &&
+                      !tags.includes(searchTerm)
+                    ) {
+                      setTags([...tags, searchTerm]);
+                      e.preventDefault();
+                      (
+                        document.getElementById("search") as HTMLInputElement
+                      ).value = "";
+                    }
+                  }}
+                />
+                <div className="flex flex-wrap max-w-56">
+                  {tags.map((tag: string, index) => (
+                    <a key={tag} className="badge">
+                      <CrossIcon
+                        onClick={() => {
+                          const newTags = removeTag(tags, tag);
+                          setTags(newTags);
+                        }}
+                      />
+                      {tag}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col px-4">
+              <h2 className="text-2xl">Difficulty</h2>
+              <div className="flex gap-3 p-2">
+                {difficulties.map((difficulty: string) => (
+                  <div key={difficulty}>
+                    <label htmlFor={difficulty}>{difficulty}</label>
+                    <input
+                      type="checkbox"
+                      id={difficulty}
+                      {...register(`difficulties.${difficulty}`)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <button className="self-center text-2xl btn">Generate</button>
+          </div>
+        </section>
+      </form>
+      <DevTool control={control} />
+    </>
   );
 }
