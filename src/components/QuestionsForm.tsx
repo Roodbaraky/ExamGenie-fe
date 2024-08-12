@@ -14,6 +14,7 @@ interface FormValues {
   search: "";
   tags: string[];
   contentType: string;
+  quantity: number;
 }
 
 export default function QuestionsForm() {
@@ -29,48 +30,51 @@ export default function QuestionsForm() {
 
   const form = useForm<FormValues>({
     defaultValues: {
-      classes: classes.reduce((acc, classItem) => {
-        acc[classItem.class_name] = false;
-        return acc;
-      }, {} as Record<string, boolean>),
-      difficulties: difficulties.reduce((acc, difficulty) => {
-        acc[difficulty] = false;
-        return acc;
-      }, {} as Record<string, boolean>),
+      classes: {},
+      // classes.reduce((acc, classItem) => {
+      //   acc[classItem.class_name] = false;
+      //   return acc;
+      // }, {} as Record<string, boolean>),
+      difficulties: {},
+      // difficulties.reduce((acc, difficulty) => {
+      //   acc[difficulty] = false;
+      //   return acc;
+      // }, {} as Record<string, boolean>),
       tags: [],
       contentType: "",
+      quantity: 1,
     },
   });
 
-  const { register, control, handleSubmit, setValue } = form;
+  const { register, control, handleSubmit } = form;
 
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = (data: FormValues) => {
     console.log("Submitted Data:", data);
-    try {
-      const response = await fetch(`http://127.0.0.1:3001/questions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        throw new Error(`Response status: ${response.status}`);
+    const postFilters = async () => {
+      try {
+        const response = await fetch(`http://127.0.0.1:3001/questions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+          throw new Error(`Response status: ${response.status}`);
+        }
+        const returnedData = await response.json();
+        console.log("returnedData: ", returnedData);
+      } catch (error) {
+        console.error((error as Error).message);
       }
-      const returnedData = await response.json();
-      console.log("returnedData: ", returnedData);
-    } catch (error) {
-      console.error((error as Error).message);
-    }
+    };
+    postFilters();
   };
 
   useEffect(() => {
     populateClasses();
   }, []);
 
-  useEffect(() => {
-    setValue("tags", tags);
-  }, [tags, setValue]);
 
   function removeTag(tags: string[], tag: string) {
     const index = tags.indexOf(tag);
@@ -121,9 +125,7 @@ export default function QuestionsForm() {
               <h2 className="text-2xl">Content Type</h2>
               {Object.entries(contentTypes).map(([code, name]) => (
                 <div key={code}>
-                  <label htmlFor={code}>
-                    {name}
-                  </label>
+                  <label htmlFor={code}>{name}</label>
                   <input
                     type="radio"
                     id={code}
@@ -133,7 +135,11 @@ export default function QuestionsForm() {
                 </div>
               ))}
             </div>
-            <h2 className="text-2xl">Quantity</h2>
+            <div>
+              <h2 className="text-2xl">Quantity</h2>
+              <label htmlFor="quantity"></label>
+              <input type="number" id="quantity" {...register("quantity")} />
+            </div>
           </div>
           <div className="flex flex-col self-end">
             <div className="flex flex-col px-4">
@@ -144,10 +150,15 @@ export default function QuestionsForm() {
                   type="text"
                   id="search"
                   onKeyDown={(e) => {
+                    if (e.currentTarget.id !== "search") {
+                      return;
+                    }
                     const searchTerm: string = (
                       document.getElementById("search") as HTMLInputElement
                     ).value;
-
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                    }
                     if (
                       searchTerm.length &&
                       e.key === "Enter" &&
