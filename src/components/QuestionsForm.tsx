@@ -7,6 +7,34 @@ import QuantitySelector from "./QuantitySelector";
 import RecallPeriodSelector from "./RecallPeriodSelector";
 import { TagsSearch } from "./TagsSearch";
 import SchemeOfWork, { Week } from "./SchemeOfWork";
+// import { BLANK_PDF, type Template } from "@pdfme/common";
+// import { generate } from "@pdfme/generator";
+
+// const template: Template = {
+//   basePdf: BLANK_PDF,
+//   schemas: [
+//     {
+//       a: {
+//         type: "text",
+//         position: { x: 0, y: 0 },
+//         width: 10,
+//         height: 10,
+//       },
+//       b: {
+//         type: "text",
+//         position: { x: 10, y: 10 },
+//         width: 10,
+//         height: 10,
+//       },
+//       c: {
+//         type: "text",
+//         position: { x: 20, y: 20 },
+//         width: 10,
+//         height: 10,
+//       },
+//     },
+//   ],
+// };
 
 export interface Class {
   id: number;
@@ -24,9 +52,9 @@ export interface FormValues {
   recallPeriod: number;
   currentWeek: number;
 }
-interface ImageURLObject{
-  status:string;
-  value:string;
+interface ImageURLObject {
+  status: string;
+  value: string;
 }
 export default function QuestionsForm() {
   const difficulties = ["foundation", "crossover", "higher", "extended"];
@@ -74,6 +102,17 @@ export default function QuestionsForm() {
         const returnedData = await response.json();
         console.log("returnedData: ", returnedData);
         setImageURLs(returnedData[1]);
+        // const inputs = returnedData[1];
+
+        // generate({ template, inputs }).then((pdf) => {
+        //   console.log(pdf);
+
+        //   const blob = new Blob([pdf.buffer], { type: "application/pdf" });
+        //   window.open(URL.createObjectURL(blob));
+
+        //   // Node.js
+        //   // fs.writeFileSync(path.join(__dirname, `test.pdf`), pdf);
+        // });
       } catch (error) {
         console.error((error as Error).message);
       }
@@ -177,9 +216,17 @@ export default function QuestionsForm() {
       "
       >
         <h2 className="text-2xl">Testing Only:</h2>
-        {imageURLs.map((imageURLObject:ImageURLObject, index) => 
-          <img key={imageURLObject.value??imageURLObject.status+index} src={imageURLObject.value??`https://1080motion.com/wp-content/uploads/2018/06/NoImageFound.jpg.png`} width={500} height={300}></img>
-        )}
+        {imageURLs.map((imageURLObject: ImageURLObject, index) => (
+          <img
+            key={imageURLObject.value ?? imageURLObject.status + index}
+            src={
+              imageURLObject.value ??
+              `https://1080motion.com/wp-content/uploads/2018/06/NoImageFound.jpg.png`
+            }
+            width={500}
+            height={300}
+          ></img>
+        ))}
       </div>
     </>
   );
