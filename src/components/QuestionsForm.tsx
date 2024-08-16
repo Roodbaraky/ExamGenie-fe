@@ -6,11 +6,14 @@ import { DifficultySelector } from "./DifficultySelectors";
 import QuantitySelector from "./QuantitySelector";
 import RecallPeriodSelector from "./RecallPeriodSelector";
 import { TagsSearch } from "./TagsSearch";
+import SchemeOfWork, { Week } from "./SchemeOfWork";
+
 export interface Class {
   id: number;
   class_name: string;
   sow_id: number;
 }
+
 export interface FormValues {
   className: string;
   difficulties: Record<string, boolean>;
@@ -19,8 +22,12 @@ export interface FormValues {
   contentType: string;
   quantity: number;
   recallPeriod: number;
+  currentWeek: number;
 }
-
+interface ImageURLObject{
+  status:string;
+  value:string;
+}
 export default function QuestionsForm() {
   const difficulties = ["foundation", "crossover", "higher", "extended"];
   const contentTypes = {
@@ -31,6 +38,9 @@ export default function QuestionsForm() {
   };
   const [tags, setTags] = useState<string[]>([]);
   const [classes, setClasses] = useState<Class[] | []>([]);
+  const [weeks, setWeeks] = useState<Week[]>([]);
+  const [selectedClass, setSelectedClass] = useState<string>("");
+  const [imageURLs, setImageURLs] = useState<ImageURLObject[]>([]);
 
   const form = useForm<FormValues>({
     defaultValues: {
@@ -40,11 +50,11 @@ export default function QuestionsForm() {
       contentType: "",
       quantity: 1,
       recallPeriod: 1,
+      currentWeek: 5,
     },
   });
 
   const { register, handleSubmit, setValue } = form;
-
   const onSubmit = (data: FormValues) => {
     console.log("Submitted Data:", data);
     const postFilters = async () => {
@@ -63,6 +73,7 @@ export default function QuestionsForm() {
         }
         const returnedData = await response.json();
         console.log("returnedData: ", returnedData);
+        setImageURLs(returnedData[1]);
       } catch (error) {
         console.error((error as Error).message);
       }
@@ -74,6 +85,12 @@ export default function QuestionsForm() {
     populateClasses();
   }, []);
 
+  useEffect(() => {
+    console.log("Class changed", selectedClass);
+    if (selectedClass) {
+      populateWeeks(selectedClass);
+    }
+  }, [selectedClass]);
   useEffect(() => {
     console.log("useEffect checker");
     setValue("tags", tags);
@@ -92,6 +109,22 @@ export default function QuestionsForm() {
     }
   };
 
+  const populateWeeks = async (className: string) => {
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:3001/weeks?className=${className}`
+      );
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+      const weeks = await response.json();
+      console.log(weeks);
+      setWeeks(weeks);
+    } catch (error) {
+      console.error((error as Error).message);
+    }
+  };
+
   return (
     <>
       <form
@@ -101,7 +134,14 @@ export default function QuestionsForm() {
       >
         <section id="controls" className="flex justify-evenly gap-4">
           <div className="flex flex-col justify-evenly">
-            <ClassSelector classes={classes} register={register} />
+            <ClassSelector
+              classes={classes}
+              register={register}
+              setSelectedClass={setSelectedClass}
+              // onChange={() => {
+              //   populateWeeks();
+              // }}
+            />
             <ContentTypeSelector
               register={register}
               contentTypes={contentTypes}
@@ -120,10 +160,27 @@ export default function QuestionsForm() {
               difficulties={difficulties}
               register={register}
             />
+
+            <label htmlFor="currentWeek">Current Week</label>
+            <input type="number" {...register("currentWeek")} />
             <button className="self-center text-2xl btn">Generate</button>
           </div>
         </section>
+        <SchemeOfWork
+          weeks={weeks}
+          // register={register}
+        />
       </form>
+      <div
+        id="images"
+        className="outline outline-1 outline-red-500 flex flex-col gap-2 items-center
+      "
+      >
+        <h2 className="text-2xl">Testing Only:</h2>
+        {imageURLs.map((imageURLObject:ImageURLObject, index) => 
+          <img key={imageURLObject.value??imageURLObject.status+index} src={imageURLObject.value??`https://1080motion.com/wp-content/uploads/2018/06/NoImageFound.jpg.png`} width={500} height={300}></img>
+        )}
+      </div>
     </>
   );
 }

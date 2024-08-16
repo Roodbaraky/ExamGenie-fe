@@ -1,0 +1,25 @@
+export interface Week {
+  week_number: number;
+  tags: string[];
+}
+
+interface SchemeOfWorkProps {
+  weeks: Week[];
+}
+export default function SchemeOfWork({ weeks }: SchemeOfWorkProps) {
+  return (
+    <div className="flex flex-col mx-36">
+      <h2 className="text-2xl">Scheme of Work</h2>
+      {weeks.map((week: Week) => (
+        <div key={week.week_number} className="flex gap-4 p-1">
+          <div>Week {week.week_number}:</div>
+          {[week.tags.map((tag) => (
+            <a key={tag} className="btn">
+              {tag.replace('-',': ')}
+            </a>
+          )), <a key={'plus-btn'} className="btn btn-outline">+</a>]}
+        </div>
+      ))}
+    </div>
+  );
+}
