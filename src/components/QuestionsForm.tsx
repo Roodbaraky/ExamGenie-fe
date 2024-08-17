@@ -10,6 +10,7 @@ import QuantitySelector from "./QuantitySelector";
 import RecallPeriodSelector from "./RecallPeriodSelector";
 import SchemeOfWork, { Week } from "./SchemeOfWork";
 import { TagsSearch } from "./TagsSearch";
+import { dateFormatter } from "../utils/dateFormatter";
 
 export interface Class {
   id: number;
@@ -77,15 +78,17 @@ export default function QuestionsForm() {
         const returnedData = await response.json();
         console.log("returnedData: ", returnedData);
         setImageURLs(returnedData[1]);
+        const format = form.getValues('contentType')
+        const className = form.getValues('className')
         const blob = await pdf(
           <PDFFile
-            format={form.getValues('contentType')}
+            format={format}
             questionURLs={returnedData[1].map(
               (URLObject: ImageURLObject) => URLObject.value
             )}
           />
         ).toBlob();
-        saveAs(blob, "test.pdf");
+        saveAs(blob, `${className} ${format} ${dateFormatter()}`);
         console.log(form.getValues('contentType'),'<----')
       } catch (error) {
         console.error((error as Error).message);
