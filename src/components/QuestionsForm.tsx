@@ -44,7 +44,7 @@ export default function QuestionsForm() {
   const [classes, setClasses] = useState<Class[] | []>([]);
   const [weeks, setWeeks] = useState<Week[]>([]);
   const [selectedClass, setSelectedClass] = useState<string>("");
-  const [imageURLs, setImageURLs] = useState<ImageURLObject[]>([]);
+  // const [imageURLs, setImageURLs] = useState<ImageURLObject[]>([]);
 
   const form = useForm<FormValues>({
     defaultValues: {
@@ -77,7 +77,7 @@ export default function QuestionsForm() {
         }
         const returnedData = await response.json();
         console.log("returnedData: ", returnedData);
-        setImageURLs(returnedData[1]);
+        // setImageURLs(returnedData[1]);
         const format = form.getValues('contentType')
         const className = form.getValues('className')
         const blob = await pdf(
@@ -154,9 +154,6 @@ export default function QuestionsForm() {
               classes={classes}
               register={register}
               setSelectedClass={setSelectedClass}
-              // onChange={() => {
-              //   populateWeeks();
-              // }}
             />
             <ContentTypeSelector
               register={register}
@@ -187,24 +184,6 @@ export default function QuestionsForm() {
           // register={register}
         />
       </form>
-      <div
-        id="images"
-        className="outline outline-1 outline-red-500 flex flex-col gap-2 items-center
-      "
-      >
-        <h2 className="text-2xl">Testing Only:</h2>
-        {imageURLs.map((imageURLObject: ImageURLObject, index) => (
-          <img
-            key={imageURLObject.value ?? imageURLObject.status + index}
-            src={
-              imageURLObject.value ??
-              `https://1080motion.com/wp-content/uploads/2018/06/NoImageFound.jpg.png`
-            }
-            width={500}
-            height={300}
-          ></img>
-        ))}
-      </div>
     </>
   );
 }
