@@ -12,12 +12,6 @@ import SchemeOfWork, { Week } from "./SchemeOfWork";
 import { TagsSearch } from "./TagsSearch";
 import { dateFormatter } from "../utils/dateFormatter";
 
-export interface Class {
-  id: number;
-  class_name: string;
-  sow_id: number;
-}
-
 export interface FormValues {
   className: string;
   difficulties: Record<string, boolean>;
@@ -42,7 +36,6 @@ export default function QuestionsForm() {
   };
 
   const [tags, setTags] = useState<string[]>([]);
-  const [classes, setClasses] = useState<Class[] | []>([]);
   const [weeks, setWeeks] = useState<Week[]>([]);
   const [selectedClass, setSelectedClass] = useState<string>("");
 
@@ -77,8 +70,8 @@ export default function QuestionsForm() {
         }
         const returnedData = await response.json();
         console.log("returnedData: ", returnedData);
-        const format = form.getValues('contentType')
-        const className = form.getValues('className')
+        const format = form.getValues("contentType");
+        const className = form.getValues("className");
         const blob = await pdf(
           <PDFFile
             format={format}
@@ -96,30 +89,17 @@ export default function QuestionsForm() {
   };
 
   useEffect(() => {
-    populateClasses();
-  }, []);
+    const className = form.getValues("className");
 
-  useEffect(() => {
     if (selectedClass) {
-      populateWeeks(selectedClass);
+      populateWeeks(className);
     }
-  }, [selectedClass]);
+    console.log("popWeeks useEffect");
+  }, [form, selectedClass]);
+
   useEffect(() => {
     setValue("tags", tags);
   }, [tags, setValue]);
-
-  const populateClasses = async () => {
-    try {
-      const response = await fetch(`http://127.0.0.1:3001/classes`);
-      if (!response.ok) {
-        throw new Error(`Response status: ${response.status}`);
-      }
-      const classes = await response.json();
-      setClasses(classes);
-    } catch (error) {
-      console.error((error as Error).message);
-    }
-  };
 
   const populateWeeks = async (className: string) => {
     try {
@@ -146,7 +126,6 @@ export default function QuestionsForm() {
         <section id="controls" className="flex justify-evenly gap-4">
           <div className="flex flex-col justify-evenly">
             <ClassSelector
-              classes={classes}
               register={register}
               setSelectedClass={setSelectedClass}
             />
@@ -168,7 +147,6 @@ export default function QuestionsForm() {
               difficulties={difficulties}
               register={register}
             />
-
             <label htmlFor="currentWeek">Current Week</label>
             <input type="number" {...register("currentWeek")} />
             <button className="self-center text-2xl btn">Generate</button>

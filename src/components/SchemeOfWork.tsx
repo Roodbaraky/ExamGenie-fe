@@ -16,10 +16,10 @@ export default function SchemeOfWork({ weeks }: SchemeOfWorkProps) {
         {weeks.map((week: Week) => (
           <div key={week.week_number} className="flex gap-4 p-1">
             <div>Week {week.week_number}:</div>
-            {[
-              week.tags.map((tag) => (
+            {[week.tags.map((tag) => (
                 <a key={tag} className="btn">
                   {tag.replace("-", ": ")}
+                  {/* do something better here ^ */}
                 </a>
               )),
               <a key={"plus-btn"} className="btn btn-outline">

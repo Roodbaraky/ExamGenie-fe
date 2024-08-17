@@ -1,18 +1,45 @@
 import { UseFormRegister } from "react-hook-form";
 import { FormValues } from "./QuestionsForm";
-import { Class } from "./QuestionsForm";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+
+export interface Class {
+  id: number;
+  class_name: string;
+  sow_id: number;
+}
 
 interface ClassSelectorProps {
-  classes: Class[];
   register: UseFormRegister<FormValues>;
   setSelectedClass: Dispatch<SetStateAction<string>>;
 }
 export default function ClassSelector({
-  classes,
   register,
   setSelectedClass,
 }: ClassSelectorProps) {
+
+  const [classes, setClasses] = useState<Class[] | []>([]);
+
+  const populateClasses = async () => {
+    try {
+      const response = await fetch(`http://127.0.0.1:3001/classes`);
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+      const classes = await response.json();
+      setClasses(classes);
+    } catch (error) {
+      console.error((error as Error).message);
+    }
+  };
+
+
+  useEffect(() => {
+    populateClasses();
+  }, []);
+
+  
+
+
   return (
     <div className="flex flex-col justify-evenly">
       <h2 className="text-2xl">Classes</h2>
