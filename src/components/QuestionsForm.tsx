@@ -23,10 +23,14 @@ export interface FormValues {
   currentWeek: number;
 }
 
-interface ImageURLObject {
-  status: string;
-  value: string;
+
+export interface Question {
+  URL?: string
+  id: number
+  difficulty: string
+  tags: string[]
 }
+
 
 export default function QuestionsForm() {
   const difficulties = ["foundation", "crossover", "higher", "extended"];
@@ -82,7 +86,7 @@ export default function QuestionsForm() {
   const generatePDF = async (
     format: string,
     className: string,
-    questionURLs: string[]
+    questionURLs: Question[]
   ) => {
     const blob = await pdf(
       <PDFFile format={format} questionURLs={questionURLs} />
@@ -95,7 +99,7 @@ export default function QuestionsForm() {
     try {
       const format = form.getValues("contentType");
       const className = form.getValues("className");
-      const questionURLs = await postFilters(data);
+      const questionURLs = (await postFilters(data))
       await generatePDF(format, className, questionURLs);
     } catch (error) {
       console.error((error as Error).message);

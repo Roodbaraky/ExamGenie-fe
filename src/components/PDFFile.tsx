@@ -1,4 +1,5 @@
 import { Document, Image, Page, StyleSheet } from "@react-pdf/renderer";
+import { Question } from "./QuestionsForm";
 
 const stylesOneQuestionSlide = StyleSheet.create({
   page: {
@@ -67,7 +68,7 @@ const stylesHalfPageAssessment = StyleSheet.create({
 });
 
 interface PDFFileProps {
-  questionURLs: string[];
+  questionURLs: Question[];
   format: string;
 }
 
@@ -96,8 +97,8 @@ export default function PDFFile({ questionURLs, format }: PDFFileProps) {
         style={styles.page}
         orientation={format.includes("QSTR") ? "landscape" : "portrait"}
       >
-        {questionURLs.map((URL: string, index: number) => (
-          <Image key={index} src={URL} style={styles.img} />
+        {questionURLs.map((questionObject: Question, index: number) => (
+          <Image key={index} src={questionObject.URL} style={styles.img}/>
         ))}
       </Page>
     </Document>
