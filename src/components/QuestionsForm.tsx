@@ -40,11 +40,11 @@ export default function QuestionsForm() {
     FPA: "Full Page Assessment",
     HPA: "Half Page Assessment",
   };
+
   const [tags, setTags] = useState<string[]>([]);
   const [classes, setClasses] = useState<Class[] | []>([]);
   const [weeks, setWeeks] = useState<Week[]>([]);
   const [selectedClass, setSelectedClass] = useState<string>("");
-  // const [imageURLs, setImageURLs] = useState<ImageURLObject[]>([]);
 
   const form = useForm<FormValues>({
     defaultValues: {
@@ -77,7 +77,6 @@ export default function QuestionsForm() {
         }
         const returnedData = await response.json();
         console.log("returnedData: ", returnedData);
-        // setImageURLs(returnedData[1]);
         const format = form.getValues('contentType')
         const className = form.getValues('className')
         const blob = await pdf(
@@ -89,7 +88,6 @@ export default function QuestionsForm() {
           />
         ).toBlob();
         saveAs(blob, `${className} ${format} ${dateFormatter()}`);
-        console.log(form.getValues('contentType'),'<----')
       } catch (error) {
         console.error((error as Error).message);
       }
@@ -102,13 +100,11 @@ export default function QuestionsForm() {
   }, []);
 
   useEffect(() => {
-    console.log("Class changed", selectedClass);
     if (selectedClass) {
       populateWeeks(selectedClass);
     }
   }, [selectedClass]);
   useEffect(() => {
-    console.log("useEffect checker");
     setValue("tags", tags);
   }, [tags, setValue]);
 
@@ -134,7 +130,6 @@ export default function QuestionsForm() {
         throw new Error(`Response status: ${response.status}`);
       }
       const weeks = await response.json();
-      console.log(weeks);
       setWeeks(weeks);
     } catch (error) {
       console.error((error as Error).message);
