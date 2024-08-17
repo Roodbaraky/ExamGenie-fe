@@ -1,40 +1,15 @@
+import { pdf } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import ClassSelector from "./ClassSelector";
 import { ContentTypeSelector } from "./ContentTypeSelector";
 import { DifficultySelector } from "./DifficultySelectors";
+import PDFFile from "./PDFFile";
 import QuantitySelector from "./QuantitySelector";
 import RecallPeriodSelector from "./RecallPeriodSelector";
-import { TagsSearch } from "./TagsSearch";
 import SchemeOfWork, { Week } from "./SchemeOfWork";
-// import { BLANK_PDF, type Template } from "@pdfme/common";
-// import { generate } from "@pdfme/generator";
-
-// const template: Template = {
-//   basePdf: BLANK_PDF,
-//   schemas: [
-//     {
-//       a: {
-//         type: "text",
-//         position: { x: 0, y: 0 },
-//         width: 10,
-//         height: 10,
-//       },
-//       b: {
-//         type: "text",
-//         position: { x: 10, y: 10 },
-//         width: 10,
-//         height: 10,
-//       },
-//       c: {
-//         type: "text",
-//         position: { x: 20, y: 20 },
-//         width: 10,
-//         height: 10,
-//       },
-//     },
-//   ],
-// };
+import { TagsSearch } from "./TagsSearch";
 
 export interface Class {
   id: number;
@@ -102,17 +77,16 @@ export default function QuestionsForm() {
         const returnedData = await response.json();
         console.log("returnedData: ", returnedData);
         setImageURLs(returnedData[1]);
-        // const inputs = returnedData[1];
-
-        // generate({ template, inputs }).then((pdf) => {
-        //   console.log(pdf);
-
-        //   const blob = new Blob([pdf.buffer], { type: "application/pdf" });
-        //   window.open(URL.createObjectURL(blob));
-
-        //   // Node.js
-        //   // fs.writeFileSync(path.join(__dirname, `test.pdf`), pdf);
-        // });
+        const blob = await pdf(
+          <PDFFile
+            format={form.getValues('contentType')}
+            questionURLs={returnedData[1].map(
+              (URLObject: ImageURLObject) => URLObject.value
+            )}
+          />
+        ).toBlob();
+        saveAs(blob, "test.pdf");
+        console.log(form.getValues('contentType'),'<----')
       } catch (error) {
         console.error((error as Error).message);
       }
