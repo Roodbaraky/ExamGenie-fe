@@ -95,9 +95,7 @@ export default function QuestionsForm() {
     try {
       const format = form.getValues("contentType");
       const className = form.getValues("className");
-      const questionURLs = (await postFilters(data))[1].map(
-        (URLObject: ImageURLObject) => URLObject.value
-      );
+      const questionURLs = await postFilters(data);
       await generatePDF(format, className, questionURLs);
     } catch (error) {
       console.error((error as Error).message);
