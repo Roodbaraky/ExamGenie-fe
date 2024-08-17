@@ -22,10 +22,12 @@ export interface FormValues {
   recallPeriod: number;
   currentWeek: number;
 }
+
 interface ImageURLObject {
   status: string;
   value: string;
 }
+
 export default function QuestionsForm() {
   const difficulties = ["foundation", "crossover", "higher", "extended"];
   const contentTypes = {
@@ -52,50 +54,61 @@ export default function QuestionsForm() {
   });
 
   const { register, handleSubmit, setValue } = form;
-  const onSubmit = (data: FormValues) => {
-    console.log("Submitted Data:", data);
-    const postFilters = async () => {
-      try {
-        let apiURl = `http://127.0.0.1:3001/questions`;
-        if (+data.quantity >= 1) apiURl += `?limit=${data.quantity}`;
-        const response = await fetch(apiURl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        });
-        if (!response.ok) {
-          throw new Error(`Response status: ${response.status}`);
-        }
-        const returnedData = await response.json();
-        console.log("returnedData: ", returnedData);
-        const format = form.getValues("contentType");
-        const className = form.getValues("className");
-        const blob = await pdf(
-          <PDFFile
-            format={format}
-            questionURLs={returnedData[1].map(
-              (URLObject: ImageURLObject) => URLObject.value
-            )}
-          />
-        ).toBlob();
-        saveAs(blob, `${className} ${format} ${dateFormatter()}`);
-      } catch (error) {
-        console.error((error as Error).message);
+
+  const postFilters = async (data: FormValues) => {
+    try {
+      let apiURl = `http://127.0.0.1:3001/questions`;
+
+      if (+data.quantity >= 1) apiURl += `?limit=${data.quantity}`;
+
+      const response = await fetch(apiURl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
       }
-    };
-    postFilters();
+      const returnedData = await response.json();
+      console.log("returnedData: ", returnedData);
+      return returnedData;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const generatePDF = async (
+    format: string,
+    className: string,
+    questionURLs: string[]
+  ) => {
+    const blob = await pdf(
+      <PDFFile format={format} questionURLs={questionURLs} />
+    ).toBlob();
+    saveAs(blob, `${className} ${format} ${dateFormatter()}`);
+  };
+
+  const onSubmit = async (data: FormValues) => {
+    console.log("Submitted Data:", data);
+    try {
+      const format = form.getValues("contentType");
+      const className = form.getValues("className");
+      const questionURLs = (await postFilters(data))[1].map(
+        (URLObject: ImageURLObject) => URLObject.value
+      );
+      await generatePDF(format, className, questionURLs);
+    } catch (error) {
+      console.error((error as Error).message);
+    }
   };
 
   useEffect(() => {
-    const className = form.getValues("className");
-
     if (selectedClass) {
-      populateWeeks(className);
+      populateWeeks(selectedClass);
     }
-    console.log("popWeeks useEffect");
-  }, [form, selectedClass]);
+  }, [selectedClass]);
 
   useEffect(() => {
     setValue("tags", tags);

@@ -32,13 +32,9 @@ export default function ClassSelector({
     }
   };
 
-
   useEffect(() => {
     populateClasses();
   }, []);
-
-  
-
 
   return (
     <div className="flex flex-col justify-evenly">
