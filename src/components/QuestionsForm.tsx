@@ -2,6 +2,7 @@ import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { dateFormatter } from "../utils/dateFormatter";
 import ClassSelector from "./ClassSelector";
 import { ContentTypeSelector } from "./ContentTypeSelector";
 import { DifficultySelector } from "./DifficultySelectors";
@@ -9,8 +10,6 @@ import PDFFile from "./PDFFile";
 import QuantitySelector from "./QuantitySelector";
 import RecallPeriodSelector from "./RecallPeriodSelector";
 import SchemeOfWork, { Week } from "./SchemeOfWork";
-import { TagsSearch } from "./TagsSearch";
-import { dateFormatter } from "../utils/dateFormatter";
 
 export interface FormValues {
   className: string;
@@ -57,7 +56,7 @@ export default function QuestionsForm() {
     },
   });
 
-  const { register, handleSubmit, setValue } = form;
+  const { register, handleSubmit, setValue } = form
 
   const postFilters = async (data: FormValues) => {
     try {
@@ -152,12 +151,12 @@ export default function QuestionsForm() {
             <RecallPeriodSelector register={register} />
           </div>
           <div className="flex flex-col self-end">
-            <TagsSearch
+            {/* <TagsSearch
               tags={tags}
               setTags={setTags}
               register={register}
               setValue={setValue}
-            />
+            /> */}
             <DifficultySelector
               difficulties={difficulties}
               register={register}

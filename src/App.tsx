@@ -1,30 +1,17 @@
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { createClient, Session } from "@supabase/supabase-js";
+import { Session } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
-import Home from "./pages/Home";
-import { Routes, Route } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
+import Login from "./components/Login";
 import QuestionsForm from "./components/QuestionsForm";
+import Home from "./pages/Home";
+import Upload from "./pages/Upload";
+import { supabase } from "./utils/supabaseClient";
 
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_PUBLIC_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
-const LogIn = () => {
-  return (
-    <div className="flex flex-col">
-      <h1 className="text-7xl text-center">ExamGenie</h1>
-      <div className="flex flex-col self-center min-w-[320px] justify-center mt-24">
-        <h2 className="text-2xl text-center">Log in</h2>
-        <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />
-      </div>
-    </div>
-  );
-};
+
 function App() {
   const [session, setSession] = useState<null | Session>(null);
-
+  const navigate = useNavigate();
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -40,12 +27,15 @@ function App() {
   }, []);
 
   if (!session) {
-    return <LogIn />;
+    navigate("/");
+    return <Login client={supabase} />;
   } else {
     return (
       <>
+      <h1 className="text-7xl text-center">ExamGenie</h1>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/upload" element={<Upload/>}/>
           <Route path="/questions" element={<QuestionsForm />} />
         </Routes>
       </>
