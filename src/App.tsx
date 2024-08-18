@@ -13,10 +13,13 @@ const supabase = createClient(
 
 const LogIn = () => {
   return (
-    <>
+    <div className="flex flex-col">
       <h1 className="text-7xl text-center">ExamGenie</h1>
-      <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />
-    </>
+      <div className="flex flex-col self-center min-w-[320px] justify-center mt-24">
+        <h2 className="text-2xl text-center">Log in</h2>
+        <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />
+      </div>
+    </div>
   );
 };
 function App() {
