@@ -173,7 +173,7 @@ export default function CustomizedHook({tags, index, setValue}:{tags:CustomTag[]
     defaultValue: [],
     multiple: true,
     options: tags.map((tag)=>tag.tag),
-    getOptionLabel: (option) => option,
+    getOptionLabel: (option) => option
   });
   useEffect(() => {
     // @ts-expect-error: Unreachable code error
@@ -193,7 +193,7 @@ export default function CustomizedHook({tags, index, setValue}:{tags:CustomTag[]
       </div>
       {groupedOptions.length > 0 ? (
         <Listbox {...getListboxProps()}>
-          {(groupedOptions as typeof tags).map((option, index) => {
+          {(groupedOptions).map((option, index) => {
             const { key, ...optionProps } = getOptionProps({ option, index });
             return (
               <li key={key} {...optionProps}>

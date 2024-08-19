@@ -3,11 +3,15 @@ import { useForm } from "react-hook-form";
 import CustomizedHook from "../components/AutocompleteSearch";
 import { Tag, UploadFormValues } from "../types/types";
 
-
 export default function Upload() {
   const [, setSelectedImages] = useState<FileList>();
   const [previewImgUrls, setPreviewimgUrls] = useState<string[]>();
   const [tags, setTags] = useState<Tag[]>();
+  const [uploadStatus, setUploadStatus] = useState({
+    notStarted: true,
+    pending: false,
+    success: false,
+  });
   const difficulties = ["foundation", "crossover", "higher", "crossover"];
 
   const handleFileChange: ChangeEventHandler<HTMLInputElement> = async (
@@ -58,7 +62,7 @@ export default function Upload() {
 
   const form = useForm<UploadFormValues>({
     defaultValues: {
-      difficulty: "",
+      difficulty: [],
       tags: undefined,
       images: undefined,
     },
@@ -68,50 +72,47 @@ export default function Upload() {
 
   const postQuestions = async (data: UploadFormValues) => {
     const { tags, difficulty, images } = data;
-    console.log(data);
-    const newTags = Object.entries(tags)
-      .filter(([, value]) => value)
-      .map((x) => x[0]);
-    const newQObject = {
-      tags: newTags,
-      difficulty,
-      images,
-    };
+    // console.log(data);
+    // const newTags = Object.entries(tags)
+    //   .filter(([, value]) => value)
+    //   .map((x) => x[0]);
+    // const newQObject = {
+    //   tags: newTags,
+    //   difficulty,
+    //   images,
+    // };
+    const imagesToUpload = images.map((image: string, index) => {
+      return {
+        image,
+        difficulty: difficulty[index],
+        tags: tags[index],
+      };
+    });
 
     const response = await fetch(`http://127.0.0.1:3001/upload`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify([newQObject]),
+      body: JSON.stringify(imagesToUpload),
     });
     if (!response.ok) {
       throw new Error(`Response status: ${response.status}`);
     }
     const questionIds = await response.json();
-    if (!questionIds.length) throw Error("Error uploading questions");
-    // ------------ Supbase bucket upload in fe ------------
-    // for (const questionId of questionIds) {
-    //   const { data, error } = await supabase.storage
-    //     .from("questions")
-    //     .upload(`public/${questionId}.png`, selectedImages![0]);
+    if (!questionIds.length) {
+      console.log("this shouldnt happen");
+      setUploadStatus({ ...uploadStatus, pending: false, notStarted: true });
 
-    //   if (error) {
-    //     console.error(
-    //       `Error uploading image for question ${questionId}:`,
-    //       error
-    //     );
-    //   } else {
-    //     console.log(
-    //       `Successfully uploaded image for question ${questionId}:`,
-    //       data
-    //     );
-    //   }
-    // }
+      throw Error("Error uploading questions");
+    } else {
+      setUploadStatus({ success: true, pending: false, notStarted: false });
+    }
   };
   const onSubmit = async (data: UploadFormValues) => {
     console.log("Uploaded Data:", data);
     try {
+      setUploadStatus({ ...uploadStatus, pending: true, notStarted: false });
       await postQuestions(data);
     } catch (error) {
       console.error((error as Error).message);
@@ -119,60 +120,54 @@ export default function Upload() {
   };
   return (
     <>
-      <form
-        id="form"
-        className="flex flex-col gap-8"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <h2 className="text-2xl">Upload</h2>
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          //see if it works with RHF just?
-          //   {...register("image")}
-          onChange={handleFileChange}
-        />
-        <div className="flex flex-col gap-2">
-          {previewImgUrls?.map((previewImgUrl: string, index) => (
-            <div key={previewImgUrl + index} className="flex">
-              <img className="max-w-52" src={previewImgUrl} />
-              <div className="flex flex-col">
-                <label htmlFor="difficulties"></label>
-                <select id="" {...register(`difficulty.${index}`)}>
-                  {difficulties.map((difficulty, index2) => (
-                    <option
-                      key={difficulty + index + index2}
-                      value={difficulty}
-                    >
-                      {difficulty}
-                    </option>
-                  ))}
-                </select>
-                <CustomizedHook
-                  tags={tags ??[]}
-                  index={index}
-                  setValue={setValue}
-                  key={previewImgUrl + index}
-                />
-              </div>
-              {/* {tags?.map((tag) => (
-                <>
-                  <label htmlFor="tags"></label>
-                  <input
-                    type="checkbox"
-                    id={tag.tag}
-                    {...register(`tags.${tag.tag}`)}
+      {uploadStatus.success && <h2>Success</h2>}
+      {uploadStatus.pending && <h2>Loading...</h2>}
+      {uploadStatus.notStarted && (
+        <form
+          id="form"
+          className="flex flex-col gap-8"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <h2 className="text-2xl">Upload</h2>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            //see if it works with RHF just?
+            //   {...register("image")}
+            onChange={handleFileChange}
+          />
+          <div className="flex flex-col gap-2">
+            {previewImgUrls?.map((previewImgUrl: string, index) => (
+              <div key={previewImgUrl + index} className="flex">
+                <img className="max-w-52" src={previewImgUrl} />
+                <div className="flex flex-col">
+                  <label htmlFor="difficulties"></label>
+                  <select id="" {...register(`difficulty.${index}`)}>
+                    {difficulties.map((difficulty, index2) => (
+                      <option
+                        key={difficulty + index + index2}
+                        value={difficulty}
+                      >
+                        {difficulty}
+                      </option>
+                    ))}
+                  </select>
+                  <CustomizedHook
+                    tags={tags ?? []}
+                    index={index}
+                    setValue={setValue}
+                    key={previewImgUrl + index}
                   />
-                </>
-              ))} */}
-            </div>
-          ))}
-          {(previewImgUrls?.length ?? 0) > 0 && (
-            <button className="btn">Upload</button>
-          )}
-        </div>
-      </form>
+                </div>
+              </div>
+            ))}
+            {(previewImgUrls?.length ?? 0) > 0 && (
+              <button className="btn">Upload</button>
+            )}
+          </div>
+        </form>
+      )}
       {/* ------------- Have some approach to uploading and tagging multiple files simultaneously -------------- */}
     </>
   );

@@ -1,8 +1,8 @@
 
 
 export interface UploadFormValues {
-    difficulty: string;
-    tags: object;
+    difficulty: string[];
+    tags: string[][];
     images: string[];
   }
   export interface Tag {
