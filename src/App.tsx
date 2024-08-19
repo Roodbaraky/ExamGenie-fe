@@ -7,8 +7,6 @@ import Home from "./pages/Home";
 import Upload from "./pages/Upload";
 import { supabase } from "./utils/supabaseClient";
 
-
-
 function App() {
   const [session, setSession] = useState<null | Session>(null);
   const navigate = useNavigate();
@@ -32,10 +30,10 @@ function App() {
   } else {
     return (
       <>
-      <h1 className="text-7xl text-center">ExamGenie</h1>
+        <h1 className="text-7xl text-center">ExamGenie</h1>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/upload" element={<Upload/>}/>
+          <Route path="/upload" element={<Upload />} />
           <Route path="/questions" element={<QuestionsForm />} />
         </Routes>
       </>
