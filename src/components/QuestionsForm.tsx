@@ -22,14 +22,12 @@ export interface FormValues {
   currentWeek: number;
 }
 
-
 export interface Question {
-  URL?: string
-  id: number
-  difficulty: string
-  tags: string[]
+  URL?: string;
+  id: number;
+  difficulty: string;
+  tags: string[];
 }
-
 
 export default function QuestionsForm() {
   const difficulties = ["foundation", "crossover", "higher", "extended"];
@@ -40,7 +38,6 @@ export default function QuestionsForm() {
     HPA: "Half Page Assessment",
   };
 
-  const [tags, setTags] = useState<string[]>([]);
   const [weeks, setWeeks] = useState<Week[]>([]);
   const [selectedClass, setSelectedClass] = useState<string>("");
 
@@ -56,7 +53,7 @@ export default function QuestionsForm() {
     },
   });
 
-  const { register, handleSubmit, setValue } = form
+  const { register, handleSubmit } = form;
 
   const postFilters = async (data: FormValues) => {
     try {
@@ -98,7 +95,7 @@ export default function QuestionsForm() {
     try {
       const format = form.getValues("contentType");
       const className = form.getValues("className");
-      const questionURLs = (await postFilters(data))
+      const questionURLs = await postFilters(data);
       await generatePDF(format, className, questionURLs);
     } catch (error) {
       console.error((error as Error).message);
@@ -110,10 +107,6 @@ export default function QuestionsForm() {
       populateWeeks(selectedClass);
     }
   }, [selectedClass]);
-
-  useEffect(() => {
-    setValue("tags", tags);
-  }, [tags, setValue]);
 
   const populateWeeks = async (className: string) => {
     try {
@@ -151,12 +144,6 @@ export default function QuestionsForm() {
             <RecallPeriodSelector register={register} />
           </div>
           <div className="flex flex-col self-end">
-            {/* <TagsSearch
-              tags={tags}
-              setTags={setTags}
-              register={register}
-              setValue={setValue}
-            /> */}
             <DifficultySelector
               difficulties={difficulties}
               register={register}

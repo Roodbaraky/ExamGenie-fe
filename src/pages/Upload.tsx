@@ -1,4 +1,3 @@
-import { createClient } from "@supabase/supabase-js";
 import { ChangeEventHandler, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { supabase } from "../utils/supabaseClient";
@@ -29,6 +28,7 @@ export default function Upload() {
       }
       const imgUrls = await Promise.all(filePromises);
       setPreviewimgUrls(imgUrls);
+      setValue('image', imgUrls[0])
     } catch (error) {
       console.log(error);
     }
@@ -62,25 +62,28 @@ export default function Upload() {
   interface UploadFormValues {
     difficulty: string;
     tags: Record<string, string>;
+    image: string
   }
 
   const form = useForm<UploadFormValues>({
     defaultValues: {
       difficulty: "",
       tags: {},
+      image: undefined,
     },
   });
 
   const { register, handleSubmit, setValue } = form;
 
   const postQuestions = async (data: UploadFormValues) => {
-    const { tags, difficulty } = data;
+    const { tags, difficulty, image } = data;
     const newTags = Object.entries(tags)
-      .filter(([key, value]) => value)
+      .filter(([, value]) => value)
       .map((x) => x[0]);
     const newQObject = {
       tags: newTags,
       difficulty,
+      image,
     };
 
     const response = await fetch(`http://127.0.0.1:3001/upload`, {
@@ -95,23 +98,23 @@ export default function Upload() {
     }
     const questionIds = await response.json();
     console.log(questionIds);
-    for (const questionId of questionIds) {
-      const { data, error } = await supabase.storage
-        .from("questions")
-        .upload(`public/${questionId}.png`, selectedImages![0]);
+    // for (const questionId of questionIds) {
+    //   const { data, error } = await supabase.storage
+    //     .from("questions")
+    //     .upload(`public/${questionId}.png`, selectedImages![0]);
 
-      if (error) {
-        console.error(
-          `Error uploading image for question ${questionId}:`,
-          error
-        );
-      } else {
-        console.log(
-          `Successfully uploaded image for question ${questionId}:`,
-          data
-        );
-      }
-    }
+    //   if (error) {
+    //     console.error(
+    //       `Error uploading image for question ${questionId}:`,
+    //       error
+    //     );
+    //   } else {
+    //     console.log(
+    //       `Successfully uploaded image for question ${questionId}:`,
+    //       data
+    //     );
+    //   }
+    // }
   };
   const onSubmit = async (data: UploadFormValues) => {
     console.log("Uploaded Data:", data);
@@ -135,6 +138,7 @@ export default function Upload() {
           type="file"
           accept="image/*"
           multiple
+        //   {...register("image")}
           onChange={handleFileChange}
         />
         <div className="flex gap-2">
