@@ -23,9 +23,14 @@ function App() {
 
     return () => subscription.unsubscribe();
   }, []);
+  useEffect(()=>{
+    if(!session){
+      console.log('useEffect test')
+      navigate('/')
+    }
+  },[navigate, session])
 
   if (!session) {
-    navigate("/");
     return <Login client={supabase} />;
   } else {
     return (

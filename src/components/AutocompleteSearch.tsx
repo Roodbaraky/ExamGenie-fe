@@ -176,7 +176,6 @@ export default function CustomizedHook({tags, index, setValue}:{tags:CustomTag[]
     getOptionLabel: (option) => option
   });
   useEffect(() => {
-    // @ts-expect-error: Unreachable code error
     setValue(`tags.${index}`,value)
   }, [value, setValue, index]);
   return (
@@ -194,9 +193,11 @@ export default function CustomizedHook({tags, index, setValue}:{tags:CustomTag[]
       {groupedOptions.length > 0 ? (
         <Listbox {...getListboxProps()}>
           {(groupedOptions).map((option, index) => {
+    // @ts-expect-error: Unreachable code error
             const { key, ...optionProps } = getOptionProps({ option, index });
             return (
               <li key={key} {...optionProps}>
+    {/* @ts-expect-error: Unreachable code error */}
                 <span>{option}</span>
                 <CheckIcon fontSize="small" />
               </li>

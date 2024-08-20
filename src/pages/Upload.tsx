@@ -72,15 +72,6 @@ export default function Upload() {
 
   const postQuestions = async (data: UploadFormValues) => {
     const { tags, difficulty, images } = data;
-    // console.log(data);
-    // const newTags = Object.entries(tags)
-    //   .filter(([, value]) => value)
-    //   .map((x) => x[0]);
-    // const newQObject = {
-    //   tags: newTags,
-    //   difficulty,
-    //   images,
-    // };
     const imagesToUpload = images.map((image: string, index) => {
       return {
         image,
@@ -168,7 +159,6 @@ export default function Upload() {
           </div>
         </form>
       )}
-      {/* ------------- Have some approach to uploading and tagging multiple files simultaneously -------------- */}
     </>
   );
 }

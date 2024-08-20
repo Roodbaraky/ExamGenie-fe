@@ -20,6 +20,7 @@ export interface FormValues {
   quantity: number;
   recallPeriod: number;
   currentWeek: number;
+  includeAnswers:boolean;
 }
 
 export interface Question {
@@ -40,6 +41,11 @@ export default function QuestionsForm() {
 
   const [weeks, setWeeks] = useState<Week[]>([]);
   const [selectedClass, setSelectedClass] = useState<string>("");
+  const [submissionState, setSubmisionState] = useState({
+    notStarted: true,
+    isPending: false,
+    isComplete: false,
+  });
 
   const form = useForm<FormValues>({
     defaultValues: {
@@ -50,6 +56,7 @@ export default function QuestionsForm() {
       quantity: 1,
       recallPeriod: 1,
       currentWeek: 5,
+      includeAnswers:false
     },
   });
 
@@ -93,6 +100,8 @@ export default function QuestionsForm() {
   const onSubmit = async (data: FormValues) => {
     console.log("Submitted Data:", data);
     try {
+      //pop up to ask if you want answers too
+      //--> setValue answers to true, so backend knows to fetch answers images from bucket too
       const format = form.getValues("contentType");
       const className = form.getValues("className");
       const questionURLs = await postFilters(data);
