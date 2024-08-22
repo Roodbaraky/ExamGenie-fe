@@ -77,7 +77,7 @@ export default function QuestionsForm() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(data),
       });
@@ -122,34 +122,37 @@ export default function QuestionsForm() {
     }
   };
 
-  const populateWeeks = useCallback(async (className: string) => {
-    if (!token) {
-      console.error("No token found");
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `http://127.0.0.1:3001/weeks?className=${className}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Response status: ${response.status}`);
+  const populateWeeks = useCallback(
+    async (className: string) => {
+      if (!token) {
+        console.error("No token found");
+        return;
       }
 
-      const weeks = await response.json();
-      setWeeks(weeks);
-    } catch (error) {
-      console.error("Error fetching weeks:", (error as Error).message);
-    }
-  }, [token]);
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:3001/weeks?className=${className}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Response status: ${response.status}`);
+        }
+
+        const weeks = await response.json();
+        setWeeks(weeks);
+      } catch (error) {
+        console.error("Error fetching weeks:", (error as Error).message);
+      }
+    },
+    [token]
+  );
 
   useEffect(() => {
     if (selectedClass) {
@@ -159,53 +162,56 @@ export default function QuestionsForm() {
 
   return (
     <>
-     <form
-  id="form"
-  className="grid grid-cols-3 gap-4 p-4"
-  onSubmit={handleSubmit(onSubmit)}
->
-  <section id="controls" className="col-span-3 grid grid-cols-2 gap-4">
-    <div className="grid grid-cols-1 gap-4">
-      <ClassSelector
-        register={register}
-        setSelectedClass={setSelectedClass}
-      />
-      <ContentTypeSelector
-        register={register}
-        contentTypes={contentTypes}
-      />
-     <div className="flex justify-between">
-        <QuantitySelector register={register} setValue={setValue} watch={watch}/>
-        <RecallPeriodSelector register={register} />
-     </div>
-    </div>
-    <div className="grid grid-cols-1 gap-4">
-      <DifficultySelector
-        difficulties={difficulties}
-        register={register}
-      />
-      <div className="flex flex-col">
-        <label htmlFor="currentWeek" className="text-xl font-medium">
-          Current Week (Dev purposes only):
-        </label>
-        <input
-          type="number"
-          {...register("currentWeek")}
-          className="border rounded-md w-64 self-center"
-        />
-      </div>
-    <button className="text-xl btn bg-blue-500 text-white py-2 px-4 rounded-lg self-center">
-      Generate
-    </button>
-    </div>
-  </section>
-  <div className="flex flex-col items-center justify-center">
-  </div>
-  <section className="col-span-3">
-    <SchemeOfWork weeks={weeks} />
-  </section>
-</form>
-
+      <form
+        id="form"
+        className="grid grid-cols-3 gap-4 p-4"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <section id="controls" className="col-span-3 grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
+            <ClassSelector
+              register={register}
+              setSelectedClass={setSelectedClass}
+            />
+            <ContentTypeSelector
+              register={register}
+              contentTypes={contentTypes}
+            />
+            <div className="flex justify-between">
+              <QuantitySelector
+                register={register}
+                setValue={setValue}
+                watch={watch}
+              />
+              <RecallPeriodSelector register={register} />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-4">
+            <DifficultySelector
+              difficulties={difficulties}
+              register={register}
+            />
+            <div className="flex flex-col">
+              <label htmlFor="currentWeek" className="text-xl font-medium">
+                Current Week (Dev purposes only):
+              </label>
+              <input
+                required
+                type="number"
+                {...register("currentWeek")}
+                className="border rounded-md w-64 self-center"
+              />
+            </div>
+            <button className="text-xl btn bg-blue-500 text-white py-2 px-4 rounded-lg self-center">
+              Generate
+            </button>
+          </div>
+        </section>
+        <div className="flex flex-col items-center justify-center"></div>
+        <section className="col-span-3">
+          <SchemeOfWork weeks={weeks} watch={watch}/>
+        </section>
+      </form>
     </>
   );
 }
