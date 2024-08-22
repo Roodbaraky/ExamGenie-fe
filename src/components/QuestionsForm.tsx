@@ -56,7 +56,7 @@ export default function QuestionsForm() {
       tags: [],
       contentType: "",
       quantity: 1,
-      recallPeriod: 1,
+      recallPeriod: 0,
       currentWeek: 5,
       includeAnswers: false,
     },

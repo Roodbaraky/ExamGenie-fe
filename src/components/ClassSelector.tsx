@@ -2,6 +2,7 @@ import { UseFormRegister } from "react-hook-form";
 import { FormValues } from "./QuestionsForm";
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
+import Loader from "./Loader";
 
 export interface Class {
   id: number;
@@ -46,7 +47,7 @@ export default function ClassSelector({
     <div className="flex flex-col justify-evenly">
       <h2 className="text-2xl">Classes</h2>
       <div className="flex gap-1">
-        {classes.map((classItem) => (
+        {classes.length?classes.map((classItem) => (
           <div key={classItem.id}>
             <input
               required
@@ -62,7 +63,7 @@ export default function ClassSelector({
             />
               <label htmlFor={classItem.class_name} className="btn btn-outline peer-checked:btn-active peer-checked:text-white">{classItem.class_name}</label>
           </div>
-        ))}
+        )):<Loader width={75} height={75} className="self-center mx-auto"/>}
       </div>
     </div>
   );

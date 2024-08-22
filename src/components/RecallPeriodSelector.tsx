@@ -11,8 +11,8 @@ export default function RecallPeriodSelector({
       <h2 className="text-2xl">Recall Period</h2>
       <select id="recall" {...register("recallPeriod")} className="rounded-lg">
         {Array.from(Array(39).keys()).map((key) => (
-          <option key={key} value={+key + 1}>
-            {+key + 1}
+          <option key={key} value={+key }>
+            {+key}
           </option>
         ))}
       </select>

@@ -1,8 +1,9 @@
-import { ChangeEventHandler, useEffect, useState } from "react";
+import { ChangeEventHandler, useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import CustomizedHook from "../components/AutocompleteSearch";
 import { Tag, UploadFormValues } from "../types/types";
 import { useAuth } from "../hooks/useAuth";
+import Loader from "../components/Loader";
 
 export default function Upload() {
   const [, setSelectedImages] = useState<FileList>();
@@ -45,7 +46,7 @@ export default function Upload() {
       reader.onload = () => resolve(reader.result as string);
     });
   };
-  const populateTags = async () => {
+  const populateTags = useCallback( async () => {
     try {
       const response = await fetch(`http://127.0.0.1:3001/tags`, {
         method: "GET",
@@ -62,11 +63,11 @@ export default function Upload() {
     } catch (error) {
       console.error((error as Error).message);
     }
-  };
+  },[token])
 
   useEffect(() => {
     populateTags();
-  }, []);
+  }, [populateTags]);
 
   const form = useForm<UploadFormValues>({
     defaultValues: {
@@ -121,7 +122,7 @@ export default function Upload() {
   return (
     <>
       {uploadStatus.success && <h2>Success</h2>}
-      {uploadStatus.pending && <h2>Loading...</h2>}
+      {uploadStatus.pending && <Loader width={90} height={90}/>}
       {uploadStatus.notStarted && (
         <form
           id="form"
