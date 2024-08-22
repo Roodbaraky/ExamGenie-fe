@@ -47,13 +47,9 @@ const stylesHalfPageAssessment = StyleSheet.create({
   page: {
     flexDirection: "column",
     backgroundColor: "#E4E4E4",
-    justifyContent: "center",
+    justifyContent: "flex-start",
   },
-  leftSection: {
-    width: "50%",
-    flexDirection: "column",
-    justifyContent: "center",
-  },
+  
   img: {
     width: "50%",
     height: "auto",
