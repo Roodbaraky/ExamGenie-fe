@@ -136,8 +136,11 @@ export default function QuestionsForm() {
       // --> setValue answers to true, so backend knows to fetch answers images from bucket too
       const format = form.getValues("contentType");
       const className = form.getValues("className");
-      const questionURLs = await postFilters(data);
+      const response = await postFilters(data);
+      const questionURLs = response[0]
+      const answerURLs = response[1]
       await generatePDF(format, className, questionURLs);
+      await generatePDF(format, 'answers '+className, answerURLs);
     } catch (error) {
       console.error("Error during form submission:", (error as Error).message);
     }
