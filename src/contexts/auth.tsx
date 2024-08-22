@@ -2,7 +2,6 @@ import { Session } from "@supabase/supabase-js";
 import { jwtDecode } from "jwt-decode";
 import React, { createContext, useEffect, useState } from "react";
 import { supabase } from "../utils/supabaseClient";
-import { useNavigate } from "react-router-dom";
 
 export interface AuthContextType {
   token: string | null;
@@ -45,7 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [token]);
 
  
 
