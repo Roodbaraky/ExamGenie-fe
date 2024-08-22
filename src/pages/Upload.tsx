@@ -4,6 +4,7 @@ import CustomizedHook from "../components/AutocompleteSearch";
 import { Tag, UploadFormValues } from "../types/types";
 import { useAuth } from "../hooks/useAuth";
 import Loader from "../components/Loader";
+import { useNavigate } from "react-router-dom";
 
 export default function Upload() {
   const [, setSelectedImages] = useState<FileList>();
@@ -16,6 +17,7 @@ export default function Upload() {
   });
   const difficulties = ["foundation", "crossover", "higher", "crossover"];
   const { token } = useAuth();
+  const navigate = useNavigate();
 
   const handleFileChange: ChangeEventHandler<HTMLInputElement> = async (
     event
@@ -46,7 +48,7 @@ export default function Upload() {
       reader.onload = () => resolve(reader.result as string);
     });
   };
-  const populateTags = useCallback( async () => {
+  const populateTags = useCallback(async () => {
     try {
       const response = await fetch(`http://127.0.0.1:3001/tags`, {
         method: "GET",
@@ -63,7 +65,7 @@ export default function Upload() {
     } catch (error) {
       console.error((error as Error).message);
     }
-  },[token])
+  }, [token]);
 
   useEffect(() => {
     populateTags();
@@ -121,16 +123,51 @@ export default function Upload() {
   };
   return (
     <>
-      {uploadStatus.success && <h2>Success</h2>}
-      {uploadStatus.pending && <Loader width={90} height={90}/>}
+      {uploadStatus.success && (
+        <div className="self-center flex flex-col">
+          <h2 className="text-2xl self-center">Success</h2>
+          <div className="flex gap-2">
+            <a
+              href=""
+              className="btn"
+              onClick={(e) => {
+                e.preventDefault();
+                setSelectedImages(undefined);
+                setPreviewimgUrls([]);
+                form.reset();
+                setUploadStatus({
+                  notStarted: true,
+                  success: false,
+                  pending: false,
+                });
+              }}
+            >
+              Start Again
+            </a>
+            <a
+              href=""
+              className="btn"
+              onClick={(e) => {
+                e.preventDefault();
+                
+                navigate("/");
+              }}
+            >
+              Home
+            </a>
+          </div>
+        </div>
+      )}
+      {uploadStatus.pending && <Loader width={90} height={90} />}
       {uploadStatus.notStarted && (
         <form
           id="form"
-          className="flex flex-col gap-8"
+          className="flex flex-col gap-8 p-4"
           onSubmit={handleSubmit(onSubmit)}
         >
           <h2 className="text-2xl">Upload</h2>
           <input
+            className="rounded-xl"
             type="file"
             accept="image/*"
             multiple
@@ -140,11 +177,15 @@ export default function Upload() {
           />
           <div className="flex flex-col gap-2">
             {previewImgUrls?.map((previewImgUrl: string, index) => (
-              <div key={previewImgUrl + index} className="flex">
-                <img className="max-w-52" src={previewImgUrl} />
+              <div key={previewImgUrl + index} className="flex gap-2">
+                <img className="max-w-52 rounded" src={previewImgUrl} />
                 <div className="flex flex-col">
                   <label htmlFor="difficulties"></label>
-                  <select id="" {...register(`difficulty.${index}`)}>
+                  <select
+                    id=""
+                    className="rounded h-8"
+                    {...register(`difficulty.${index}`)}
+                  >
                     {difficulties.map((difficulty, index2) => (
                       <option
                         key={difficulty + index + index2}

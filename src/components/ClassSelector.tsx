@@ -46,7 +46,7 @@ export default function ClassSelector({
   return (
     <div className="flex flex-col justify-evenly">
       <h2 className="text-2xl">Classes</h2>
-      <div className="flex gap-1">
+      <div className="flex flex-wrap gap-1">
         {classes.length?classes.map((classItem) => (
           <div key={classItem.id}>
             <input

@@ -1,10 +1,17 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Home() {
+  const { user_role } = useAuth();
+
+  useEffect(() => {
+    console.log(user_role);
+  }, [user_role]);
   const navigate = useNavigate();
   return (
     <>
-      <div className="flex self-center justify-center">
+      <div className="flex self-center justify-center gap-2">
         <div
           className="btn"
           onClick={() => {
@@ -14,9 +21,11 @@ export default function Home() {
           Questions
         </div>
         <div
-          className="btn"
+          className={`btn ${
+            user_role && user_role === "admin" ? "" : "btn-disabled"
+          }`}
           onClick={() => {
-            navigate("/upload");
+            if (user_role === "admin") navigate("/upload");
           }}
         >
           Upload

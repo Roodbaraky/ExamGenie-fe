@@ -6,26 +6,14 @@ import QuestionsForm from "./components/QuestionsForm";
 import Home from "./pages/Home";
 import Upload from "./pages/Upload";
 import { supabase } from "./utils/supabaseClient";
+import { useAuth } from "./hooks/useAuth";
 
 function App() {
-  const [session, setSession] = useState<null | Session>(null);
+  const {session} = useAuth()
   const navigate = useNavigate();
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
   useEffect(() => {
     if (!session) {
-      console.log("useEffect test");
       setTimeout(() => {
         navigate("/");
       }, 50);
@@ -37,7 +25,8 @@ function App() {
   } else {
     return (
       <>
-        <h1 className="text-7xl text-center">ExamGenie</h1>
+        <h1 className="text-7xl text-center btn mb-10 w-fit h-fit self-center rounded-xl" onClick={()=>{navigate('/')}}>ExamGenie</h1>
+
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/upload" element={<Upload />} />

@@ -11,6 +11,7 @@ import QuantitySelector from "./QuantitySelector";
 import RecallPeriodSelector from "./RecallPeriodSelector";
 import SchemeOfWork, { Week } from "./SchemeOfWork";
 import { useAuth } from "../hooks/useAuth";
+import Loader from "./Loader";
 
 export interface FormValues {
   className: string;
@@ -56,8 +57,8 @@ export default function QuestionsForm() {
       tags: [],
       contentType: "",
       quantity: 1,
-      recallPeriod: 0,
-      currentWeek: 5,
+      recallPeriod: 5,
+      currentWeek: 25,
       includeAnswers: false,
     },
   });
@@ -68,6 +69,11 @@ export default function QuestionsForm() {
       console.error("No token found");
       return;
     }
+    setSubmissionState({
+      ...submissionState,
+      notStarted: false,
+      isPending: true,
+    });
     try {
       let apiURL = `http://127.0.0.1:3001/questions`;
 
@@ -87,10 +93,25 @@ export default function QuestionsForm() {
       }
 
       const returnedData = await response.json();
+
       console.log("returnedData: ", returnedData);
+      setSubmissionState({
+        ...submissionState,
+        isPending: false,
+        isComplete: true,
+      });
+      form.reset()
+
       return returnedData;
     } catch (error) {
       console.error("Error posting filters:", error);
+      setSubmissionState({
+        ...submissionState,
+        notStarted: true,
+        isPending: false,
+        isComplete: false,
+      });
+
       return Promise.reject(error);
     }
   };
@@ -202,14 +223,14 @@ export default function QuestionsForm() {
                 className="border rounded-md w-64 self-center"
               />
             </div>
-            <button className="text-xl btn bg-blue-500 text-white py-2 px-4 rounded-lg self-center">
+            {submissionState.notStarted?<button className="text-xl btn bg-blue-500 text-white py-2 px-4 rounded-lg self-center">
               Generate
-            </button>
-          </div>
+            </button>:<Loader width={75} height={75}/>}
+            </div>
         </section>
         <div className="flex flex-col items-center justify-center"></div>
-        <section className="col-span-3">
-          <SchemeOfWork weeks={weeks} watch={watch}/>
+        <section id="sow" className="col-span-3">
+          <SchemeOfWork weeks={weeks} watch={watch} />
         </section>
       </form>
     </>

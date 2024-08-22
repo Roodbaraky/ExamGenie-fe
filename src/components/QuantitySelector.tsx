@@ -18,9 +18,9 @@ const QuantitySelector = ({
 }: QuantitySelectorProps) => {
   const quantity = watch("quantity");
   return (
-    <div className="flex content-between justify-between gap-4 ">
+    <div className="flex flex-wrap flex-col sm:flex-row content-between justify-between gap-4 ">
       <h2 className="text-2xl">Quantity</h2>
-     <div>
+     <div className="flex w-9">
         <button
           type="button"
           className="btn btn-sm btn-outline"
@@ -34,7 +34,7 @@ const QuantitySelector = ({
           id="quantity"
           {...register("quantity",{valueAsNumber:true})}
           value={+quantity}
-          className="text-center w-12 "
+          className="text-center self-center w-12 h-8"
         />
         <button
           type="button"

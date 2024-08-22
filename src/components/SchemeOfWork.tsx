@@ -35,16 +35,8 @@ export default function SchemeOfWork({ weeks, watch }: SchemeOfWorkProps) {
             {[
               week.tags.map((tag) => (
                 <a key={tag} className="btn">
-                {(() => {
-                  const [firstWord, ...rest] = tag.split('-');
-                  const restOfTag = rest.join('-');
-                  
-                  if (week.tags.filter((tag)=>tag.includes(firstWord)).length>1) {
-                    return `${firstWord}: ${restOfTag.replace(/-/g, ' ')}`;
-                  } else {
-                    return tag.replace(/-/g, ' ');
-                  }
-                })()}
+                {tag.replace(/-/g, ' ')}
+          
               </a>
               
               )),
