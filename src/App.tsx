@@ -45,8 +45,8 @@ function App() {
               <a
                 className="btn w-fit h-fit"
                 onClick={() => {
-                  setToken(null);
-                  window
+                  setToken(null)
+                  window.location.reload()
                 }}
               >
                 Log out

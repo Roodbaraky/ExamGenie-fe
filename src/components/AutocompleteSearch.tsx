@@ -1,50 +1,56 @@
-import { AutocompleteGetTagProps, useAutocomplete } from '@mui/base/useAutocomplete';
-import CheckIcon from '@mui/icons-material/Check';
-import CloseIcon from '@mui/icons-material/Close';
-import { autocompleteClasses } from '@mui/material/Autocomplete';
-import { styled } from '@mui/material/styles';
-import { useEffect } from 'react';
-import { UseFormSetValue } from 'react-hook-form';
-import { UploadFormValues, Tag as CustomTag  } from '../types/types';
+import {
+  AutocompleteGetTagProps,
+  useAutocomplete,
+} from "@mui/base/useAutocomplete";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
+import { autocompleteClasses } from "@mui/material/Autocomplete";
+import { styled } from "@mui/material/styles";
+import { useEffect } from "react";
+import { UseFormSetValue } from "react-hook-form";
+import { UploadFormValues, Tag as CustomTag } from "../types/types";
+import { CloseSharp, Delete } from "@mui/icons-material";
 
-const Root = styled('div')(
+const Root = styled("div")(
   ({ theme }) => `
   color: ${
-    theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,.85)'
+    theme.palette.mode === "dark" ? "rgba(255,255,255,0.65)" : "rgba(0,0,0,.85)"
   };
   font-size: 14px;
-`,
+`
 );
 
-const Label = styled('label')`
+const Label = styled("label")`
   padding: 0 0 4px;
   line-height: 1.5;
   display: block;
 `;
 
-const InputWrapper = styled('div')(
+const InputWrapper = styled("div")(
   ({ theme }) => `
   width: 300px;
-  border: 1px solid ${theme.palette.mode === 'dark' ? '#434343' : '#d9d9d9'};
-  background-color: ${theme.palette.mode === 'dark' ? '#141414' : '#fff'};
+  border: 1px solid ${theme.palette.mode === "dark" ? "#434343" : "#d9d9d9"};
+  background-color: ${theme.palette.mode === "dark" ? "#141414" : "#fff"};
   border-radius: 4px;
   padding: 1px;
   display: flex;
   flex-wrap: wrap;
 
   &:hover {
-    border-color: ${theme.palette.mode === 'dark' ? '#177ddc' : '#40a9ff'};
+    border-color: ${theme.palette.mode === "dark" ? "#177ddc" : "#40a9ff"};
   }
 
   &.focused {
-    border-color: ${theme.palette.mode === 'dark' ? '#177ddc' : '#40a9ff'};
+    border-color: ${theme.palette.mode === "dark" ? "#177ddc" : "#40a9ff"};
     box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
   }
 
   & input {
-    background-color: ${theme.palette.mode === 'dark' ? '#141414' : '#fff'};
+    background-color: ${theme.palette.mode === "dark" ? "#141414" : "#fff"};
     color: ${
-      theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,.85)'
+      theme.palette.mode === "dark"
+        ? "rgba(255,255,255,0.65)"
+        : "rgba(0,0,0,.85)"
     };
     height: 30px;
     box-sizing: border-box;
@@ -56,7 +62,7 @@ const InputWrapper = styled('div')(
     margin: 0;
     outline: 0;
   }
-`,
+`
 );
 
 interface TagProps extends ReturnType<AutocompleteGetTagProps> {
@@ -68,7 +74,8 @@ function Tag(props: TagProps) {
   return (
     <div {...other}>
       <span>{label}</span>
-      <CloseIcon onClick={onDelete} />
+      <a onClick={onDelete} className="mx-1 cursor-pointer font-thin">{' x '}</a>
+      
     </div>
   );
 }
@@ -81,9 +88,9 @@ const StyledTag = styled(Tag)<TagProps>(
   margin: 2px;
   line-height: 22px;
   background-color: ${
-    theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#fafafa'
+    theme.palette.mode === "dark" ? "rgba(255,255,255,0.08)" : "#fafafa"
   };
-  border: 1px solid ${theme.palette.mode === 'dark' ? '#303030' : '#e8e8e8'};
+  border: 1px solid ${theme.palette.mode === "dark" ? "#303030" : "#e8e8e8"};
   border-radius: 2px;
   box-sizing: content-box;
   padding: 0 4px 0 10px;
@@ -91,8 +98,8 @@ const StyledTag = styled(Tag)<TagProps>(
   overflow: hidden;
 
   &:focus {
-    border-color: ${theme.palette.mode === 'dark' ? '#177ddc' : '#40a9ff'};
-    background-color: ${theme.palette.mode === 'dark' ? '#003b57' : '#e6f7ff'};
+    border-color: ${theme.palette.mode === "dark" ? "#177ddc" : "#40a9ff"};
+    background-color: ${theme.palette.mode === "dark" ? "#003b57" : "#e6f7ff"};
   }
 
   & span {
@@ -106,17 +113,17 @@ const StyledTag = styled(Tag)<TagProps>(
     cursor: pointer;
     padding: 4px;
   }
-`,
+`
 );
 
-const Listbox = styled('ul')(
+const Listbox = styled("ul")(
   ({ theme }) => `
   width: 300px;
   margin: 2px 0 0;
   padding: 0;
   position: absolute;
   list-style: none;
-  background-color: ${theme.palette.mode === 'dark' ? '#141414' : '#fff'};
+  background-color: ${theme.palette.mode === "dark" ? "#141414" : "#fff"};
   overflow: auto;
   max-height: 250px;
   border-radius: 4px;
@@ -137,7 +144,7 @@ const Listbox = styled('ul')(
   }
 
   & li[aria-selected='true'] {
-    background-color: ${theme.palette.mode === 'dark' ? '#2b2b2b' : '#fafafa'};
+    background-color: ${theme.palette.mode === "dark" ? "#2b2b2b" : "#fafafa"};
     font-weight: 600;
 
     & svg {
@@ -146,17 +153,25 @@ const Listbox = styled('ul')(
   }
 
   & li.${autocompleteClasses.focused} {
-    background-color: ${theme.palette.mode === 'dark' ? '#003b57' : '#e6f7ff'};
+    background-color: ${theme.palette.mode === "dark" ? "#003b57" : "#e6f7ff"};
     cursor: pointer;
 
     & svg {
       color: currentColor;
     }
   }
-`,
+`
 );
 
-export default function CustomizedHook({tags, index, setValue}:{tags:CustomTag[], index:number, setValue: UseFormSetValue<UploadFormValues>}) {
+export default function CustomizedHook({
+  tags,
+  index,
+  setValue,
+}: {
+  tags: CustomTag[];
+  index: number;
+  setValue: UseFormSetValue<UploadFormValues>;
+}) {
   const {
     getRootProps,
     getInputLabelProps,
@@ -169,37 +184,40 @@ export default function CustomizedHook({tags, index, setValue}:{tags:CustomTag[]
     focused,
     setAnchorEl,
   } = useAutocomplete({
-    id: 'customized-hook-demo',
+    id: "customized-hook-demo",
     defaultValue: [],
     multiple: true,
-    options: tags.map((tag)=>tag.tag),
-    getOptionLabel: (option) => option
+    options: tags.map((tag) => tag.tag),
+    getOptionLabel: (option) => option,
   });
   useEffect(() => {
-    setValue(`tags.${index}`,value)
+    setValue(`tags.${index}`, value);
   }, [value, setValue, index]);
   return (
     <Root>
       <div {...getRootProps()}>
-        <Label {...getInputLabelProps()}>Tags:</Label>
-        <InputWrapper ref={setAnchorEl} className={focused ? 'focused' : ''}>
+        <Label {...getInputLabelProps()}></Label>
+        <InputWrapper ref={setAnchorEl} className={focused ? "focused" : ""}>
           {value.map((option: string, index: number) => {
             const { key, ...tagProps } = getTagProps({ index });
             return <StyledTag key={key} {...tagProps} label={option} />;
           })}
-          <input {...getInputProps()} />
+          <input
+            {...getInputProps()}
+            placeholder={!value.length ? "Start typing or select tags..." : ""}
+          />
         </InputWrapper>
       </div>
       {groupedOptions.length > 0 ? (
         <Listbox {...getListboxProps()}>
-          {(groupedOptions).map((option, index) => {
-    // @ts-expect-error: Unreachable code error
+          {groupedOptions.map((option, index) => {
+            // @ts-expect-error: Unreachable code error
             const { key, ...optionProps } = getOptionProps({ option, index });
             return (
               <li key={key} {...optionProps}>
-    {/* @ts-expect-error: Unreachable code error */}
+                {/* @ts-expect-error: Unreachable code error */}
                 <span>{option}</span>
-                <CheckIcon fontSize="small" />
+                <CheckIcon fontSize="small"/>
               </li>
             );
           })}

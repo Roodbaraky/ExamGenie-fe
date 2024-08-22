@@ -178,7 +178,7 @@ export default function Upload() {
           <div className="flex flex-col gap-2">
             {previewImgUrls?.map((previewImgUrl: string, index) => (
               <div key={previewImgUrl + index} className="flex gap-2">
-                <img className="max-w-52 rounded" src={previewImgUrl} />
+                <img className="max-w-52 w-52 max-h-36 rounded" src={previewImgUrl} />
                 <div className="flex flex-col">
                   <label htmlFor="difficulties"></label>
                   <select
