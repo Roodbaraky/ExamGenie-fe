@@ -15,12 +15,13 @@ export const DifficultySelector = ({
     <div className="flex gap-3 p-2">
       {difficulties.map((difficulty: string) => (
         <div key={difficulty}>
-          <label htmlFor={difficulty}>{difficulty}</label>
           <input
+          className="hidden peer"
             type="checkbox"
             id={difficulty}
             {...register(`difficulties.${difficulty}`)}
           />
+          <label htmlFor={difficulty} className="btn btn-outline peer-checked:btn-active peer-checked:text-white">{difficulty}</label>
         </div>
       ))}
     </div>

@@ -13,6 +13,14 @@ export default function Home() {
         >
           Questions
         </div>
+        <div
+          className="btn"
+          onClick={() => {
+            navigate("/upload");
+          }}
+        >
+          Upload
+        </div>
       </div>
     </>
   );

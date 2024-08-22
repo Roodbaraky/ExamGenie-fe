@@ -7,17 +7,17 @@ export default function RecallPeriodSelector({
   register,
 }: RecallPeriodSelectorProps) {
   return (
-    <div>
+    <div className="flex gap-4">
       <h2 className="text-2xl">Recall Period</h2>
-      <label htmlFor="recall"></label>
-      <select id="recall" {...register("recallPeriod")}>
+      <select id="recall" {...register("recallPeriod")} className="rounded-lg">
         {Array.from(Array(39).keys()).map((key) => (
           <option key={key} value={+key + 1}>
             {+key + 1}
           </option>
         ))}
       </select>
-      Week/s
+        <label htmlFor="recall" className="self-center">Week/s</label>
+     
     </div>
   );
 }

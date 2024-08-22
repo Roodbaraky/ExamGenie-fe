@@ -1,6 +1,7 @@
 import { UseFormRegister } from "react-hook-form";
 import { FormValues } from "./QuestionsForm";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
+import { useAuth } from "../hooks/useAuth";
 
 export interface Class {
   id: number;
@@ -16,12 +17,17 @@ export default function ClassSelector({
   register,
   setSelectedClass,
 }: ClassSelectorProps) {
-
   const [classes, setClasses] = useState<Class[] | []>([]);
-
-  const populateClasses = async () => {
+  const {token} = useAuth();
+  const populateClasses = useCallback( async () => {
     try {
-      const response = await fetch(`http://127.0.0.1:3001/classes`);
+      const response = await fetch(`http://127.0.0.1:3001/classes`, {
+        method:'GET',
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
       if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
       }
@@ -30,11 +36,11 @@ export default function ClassSelector({
     } catch (error) {
       console.error((error as Error).message);
     }
-  };
+  },[token])
 
   useEffect(() => {
     populateClasses();
-  }, []);
+  }, [populateClasses]);
 
   return (
     <div className="flex flex-col justify-evenly">
@@ -42,18 +48,19 @@ export default function ClassSelector({
       <div className="flex gap-1">
         {classes.map((classItem) => (
           <div key={classItem.id}>
-            <label htmlFor={classItem.class_name}>{classItem.class_name}</label>
             <input
               required
               type="radio"
               id={classItem.class_name}
               value={classItem.class_name}
+              className="hidden peer"
               {...register(`className`, {
                 onChange: (e) => {
                   setSelectedClass(e.target.value);
                 },
               })}
             />
+              <label htmlFor={classItem.class_name} className="btn btn-outline peer-checked:btn-active peer-checked:text-white">{classItem.class_name}</label>
           </div>
         ))}
       </div>

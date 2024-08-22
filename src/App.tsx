@@ -23,12 +23,14 @@ function App() {
 
     return () => subscription.unsubscribe();
   }, []);
-  useEffect(()=>{
-    if(!session){
-      console.log('useEffect test')
-      navigate('/')
+  useEffect(() => {
+    if (!session) {
+      console.log("useEffect test");
+      setTimeout(() => {
+        navigate("/");
+      }, 50);
     }
-  },[navigate, session])
+  }, [navigate, session]);
 
   if (!session) {
     return <Login client={supabase} />;

@@ -2,6 +2,7 @@ import { ChangeEventHandler, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import CustomizedHook from "../components/AutocompleteSearch";
 import { Tag, UploadFormValues } from "../types/types";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Upload() {
   const [, setSelectedImages] = useState<FileList>();
@@ -13,6 +14,7 @@ export default function Upload() {
     success: false,
   });
   const difficulties = ["foundation", "crossover", "higher", "crossover"];
+  const { token } = useAuth();
 
   const handleFileChange: ChangeEventHandler<HTMLInputElement> = async (
     event
@@ -45,7 +47,13 @@ export default function Upload() {
   };
   const populateTags = async () => {
     try {
-      const response = await fetch(`http://127.0.0.1:3001/tags`);
+      const response = await fetch(`http://127.0.0.1:3001/tags`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
       }
@@ -84,6 +92,7 @@ export default function Upload() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(imagesToUpload),
     });

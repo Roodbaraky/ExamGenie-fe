@@ -9,10 +9,10 @@ interface SchemeOfWorkProps {
 export default function SchemeOfWork({ weeks }: SchemeOfWorkProps) {
   weeks.sort((a, b) => a.week_number - b.week_number);
   return (
-    <div className="flex flex-col mx-36 ">
+    <div className="flex flex-col">
       <h2 className="text-2xl">Scheme of Work</h2>
 
-      <div className="overflow-scroll max-h-96">
+      <div className="overflow-scroll max-h-96 p-4">
         {weeks.map((week: Week) => (
           <div key={week.week_number} className="flex gap-4 p-1">
             <div>Week {week.week_number}:</div>
