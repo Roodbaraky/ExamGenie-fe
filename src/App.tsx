@@ -7,6 +7,7 @@ import { useAuth } from "./hooks/useAuth";
 import Home from "./pages/Home";
 import Upload from "./pages/Upload";
 import { supabase } from "./utils/supabaseClient";
+import Footer from "./components/Footer";
 
 function App() {
   const { session, user_role, setToken } = useAuth();
@@ -62,8 +63,8 @@ function App() {
           <Route path="/questions" element={<QuestionsForm />} />
         </Routes>
       
+        <Footer/>
     </main>
-    
     );
   }
 }

@@ -10,7 +10,7 @@ export const DifficultySelector = ({
   difficulties,
   register,
 }: DifficultySelectorProps) => (
-  <div className="flex flex-col ">
+  <div className="flex flex-col">
     <h2 className="text-2xl">Difficulty</h2>
     <div className="flex flex-wrap  gap-2">
       {difficulties.map((difficulty: string) => (

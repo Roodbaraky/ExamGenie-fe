@@ -10,13 +10,13 @@ export const ContentTypeSelector = ({
   contentTypes,
   register,
 }: ContentTypeSelectorProps) => (
-  <div className="flex flex-col rounded-md ">
+  <div className="flex flex-col justify-center rounded-md ">
     <h2 className="text-2xl">Content Type</h2>
-    <div className="grid grid-cols-2 grid-rows-2 place-items-center gap-2">
+    <div className="grid grid-cols-2 grid-rows-2 items-center content-center place-items-center gap-2">
       {Object.entries(contentTypes).map(([code, name]) => (
         <div className="w-full flex flex-grow" key={code}>
           <input
-            className="opacity-0 peer"
+            className="opacity-0 absolute peer"
             required
             type="radio"
             id={code}

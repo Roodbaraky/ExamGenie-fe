@@ -54,7 +54,7 @@ export default function ClassSelector({
               type="radio"
               id={classItem.class_name}
               value={classItem.class_name}
-              className="opacity-0 peer"
+              className="opacity-0 absolute peer"
               {...register(`className`, {
                 onChange: (e) => {
                   setSelectedClass(e.target.value);

@@ -1,6 +1,12 @@
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
-import { useCallback, useEffect, useState } from "react";
+import {
+  MouseEvent,
+  PointerEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { useForm } from "react-hook-form";
 import { dateFormatter } from "../utils/dateFormatter";
 import ClassSelector from "./ClassSelector";
@@ -13,6 +19,7 @@ import SchemeOfWork, { Week } from "./SchemeOfWork";
 import { useAuth } from "../hooks/useAuth";
 import Loader from "./Loader";
 import CurrentWeek from "./CurrentWeek";
+import { RestartAlt } from "@mui/icons-material";
 
 export interface FormValues {
   className: string;
@@ -50,6 +57,8 @@ export default function QuestionsForm() {
     isPending: false,
     isComplete: false,
   });
+  const [isDownloadReady, setIsDownloadReady] = useState(false);
+  const [returnedData, setReturnedData] = useState();
 
   const form = useForm<FormValues>({
     defaultValues: {
@@ -105,7 +114,8 @@ export default function QuestionsForm() {
         isPending: false,
         isComplete: true,
       });
-      form.reset();
+      // form.reset();
+      setIsDownloadReady(true);
 
       return returnedData;
     } catch (error) {
@@ -120,7 +130,15 @@ export default function QuestionsForm() {
       return Promise.reject(error);
     }
   };
-
+  const handleDownload = async (e: MouseEvent) => {
+    const format = form.getValues("contentType");
+    const className = form.getValues("className");
+    if ((e.target as HTMLElement).id === "q-download" && returnedData) {
+      await generatePDF(format, className, returnedData[0]);
+    } else if ((e.target as HTMLElement).id === "a-download" && returnedData) {
+      await generatePDF(format, "answers " + className, returnedData[1]);
+    }
+  };
   const generatePDF = async (
     format: string,
     className: string,
@@ -134,18 +152,9 @@ export default function QuestionsForm() {
 
   const onSubmit = async (data: FormValues) => {
     console.log("Submitted Data:", data);
-    // console.log("Token:", token);
-
     try {
-      // Pop up to ask if you want answers too
-      // --> setValue answers to true, so backend knows to fetch answers images from bucket too
-      const format = form.getValues("contentType");
-      const className = form.getValues("className");
       const response = await postFilters(data);
-      const questionURLs = response[0];
-      const answerURLs = response[1];
-      await generatePDF(format, className, questionURLs);
-      await generatePDF(format, "answers " + className, answerURLs);
+      setReturnedData(response);
     } catch (error) {
       console.error("Error during form submission:", (error as Error).message);
     }
@@ -198,7 +207,7 @@ export default function QuestionsForm() {
       >
         <section
           id="controls"
-          className="p-4 col-start-1 col-span-1 flex flex-col gap-4 h-full max-h-[550px] bg-base-200 rounded-xl"
+          className="p-4 col-start-1 col-span-1 flex flex-col gap-4 h-full max-h-[590px] bg-base-200 rounded-xl"
         >
           <ClassSelector
             register={register}
@@ -223,22 +232,40 @@ export default function QuestionsForm() {
 
         <section
           id="sow"
-          className="bg-base-200  p-4 col-start-2 col-span-1 h-[550px] flex flex-shrink rounded-xl"
+          className="bg-base-200  p-4 col-start-2 col-span-1 h-[590px] flex flex-shrink rounded-xl"
         >
           <SchemeOfWork weeks={weeks} watch={watch} />
         </section>
-        {submissionState.notStarted ? (
+        {submissionState.notStarted && !isDownloadReady ? (
           <button
             disabled={isSubmitDisabled}
-            className="text-xl btn btn-primary py-2 px-4 rounded-lg  col-span-2 my-auto mx-auto w-[60%] max-w-64"
+            className="text-3xl btn btn-primary btn-lg py-2 px-4 rounded-lg  col-span-2 my-auto mx-auto w-[60%] max-w-64"
           >
             Generate
           </button>
+        ) : isDownloadReady ? (
+          <div className="flex gap-4 self-center mx-auto col-start-1 col-span-2">
+            <a id="q-download" className="btn btn-lg" onClick={handleDownload}>
+              Download Questions
+            </a>
+            <a id="a-download" className="btn btn-lg" onClick={handleDownload}>
+              Download Answers
+            </a>
+            <a
+              className="btn btn-lg btn-outline"
+              onClick={() => {
+                setIsDownloadReady(false);
+                form.reset();
+              }}
+            >
+              <RestartAlt />
+            </a>
+          </div>
         ) : (
           <Loader
             width={75}
             height={75}
-            className="my-auto mx-auto text-center place-content-center"
+            className="my-auto mx-auto text-center place-content-center col-span-2 col-start-1 self-center"
           />
         )}
       </form>
