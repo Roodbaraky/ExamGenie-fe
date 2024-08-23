@@ -18,12 +18,12 @@ const QuantitySelector = ({
 }: QuantitySelectorProps) => {
   const quantity = watch("quantity");
   return (
-    <div className="flex flex-wrap flex-col sm:flex-row content-between justify-between gap-4 ">
-      <h2 className="text-2xl">Quantity</h2>
-     <div className="flex w-9">
+    <div className="flex  flex-col  min-w-fit content-between justify-center  gap-4 bg-base-100 p-1 rounded-md">
+      <h2 className="text-2xl text-center">Quantity</h2>
+     <div className="flex w-14 min-w-28 justify-center">
         <button
           type="button"
-          className="btn btn-sm btn-outline"
+          className="btn btn-sm btn-primary"
           onClick={() => setValue("quantity", Math.max(quantity - 1, 1))}
         >
           -
@@ -38,7 +38,7 @@ const QuantitySelector = ({
         />
         <button
           type="button"
-          className="btn btn-sm btn-outline"
+          className="btn btn-sm btn-primary"
           onClick={() => setValue("quantity", +quantity + 1)}
         >
           +

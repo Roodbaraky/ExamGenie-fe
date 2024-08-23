@@ -46,9 +46,9 @@ export default function ClassSelector({
   return (
     <div className="flex flex-col justify-evenly">
       <h2 className="text-2xl">Classes</h2>
-      <div className="flex flex-wrap gap-1">
+      <div className="flex gap-2 flex-wrap justify-evenly">
         {classes.length?classes.map((classItem) => (
-          <div key={classItem.id}>
+          <div key={classItem.id} className="flex flex-grow">
             <input
               required
               type="radio"
@@ -61,7 +61,7 @@ export default function ClassSelector({
                 },
               })}
             />
-              <label htmlFor={classItem.class_name} className="btn btn-outline peer-checked:btn-active peer-checked:text-white">{classItem.class_name}</label>
+              <label htmlFor={classItem.class_name} className="btn btn-outline peer-checked:btn-active peer-checked:text-white flex-grow">{classItem.class_name}</label>
           </div>
         )):<Loader width={75} height={75} className="self-center mx-auto"/>}
       </div>

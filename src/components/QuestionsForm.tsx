@@ -12,6 +12,7 @@ import RecallPeriodSelector from "./RecallPeriodSelector";
 import SchemeOfWork, { Week } from "./SchemeOfWork";
 import { useAuth } from "../hooks/useAuth";
 import Loader from "./Loader";
+import CurrentWeek from "./CurrentWeek";
 
 export interface FormValues {
   className: string;
@@ -100,7 +101,7 @@ export default function QuestionsForm() {
         isPending: false,
         isComplete: true,
       });
-      form.reset()
+      form.reset();
 
       return returnedData;
     } catch (error) {
@@ -137,10 +138,10 @@ export default function QuestionsForm() {
       const format = form.getValues("contentType");
       const className = form.getValues("className");
       const response = await postFilters(data);
-      const questionURLs = response[0]
-      const answerURLs = response[1]
+      const questionURLs = response[0];
+      const answerURLs = response[1];
       await generatePDF(format, className, questionURLs);
-      await generatePDF(format, 'answers '+className, answerURLs);
+      await generatePDF(format, "answers " + className, answerURLs);
     } catch (error) {
       console.error("Error during form submission:", (error as Error).message);
     }
@@ -186,13 +187,10 @@ export default function QuestionsForm() {
 
   return (
     <>
-      <form
-        id="form"
-        className="grid grid-cols-3 gap-4 p-4"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <section id="controls" className="col-span-3 grid grid-cols-2 gap-4">
-          <div className="grid grid-cols-1 gap-4">
+      <form id="form" className="flex flex-col justify-evenly gap-4 h-full relative max-h-full" onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex gap-4 relative max-h-full
+        ">
+          <section id="controls" className="p-4 w-7/12 flex flex-col gap-4">
             <ClassSelector
               register={register}
               setSelectedClass={setSelectedClass}
@@ -201,7 +199,8 @@ export default function QuestionsForm() {
               register={register}
               contentTypes={contentTypes}
             />
-            <div className="flex justify-between">
+              <DifficultySelector difficulties={difficulties} register={register} />
+            <div className="flex justify-evenly">
               <QuantitySelector
                 register={register}
                 setValue={setValue}
@@ -209,32 +208,21 @@ export default function QuestionsForm() {
               />
               <RecallPeriodSelector register={register} />
             </div>
-          </div>
-          <div className="grid grid-cols-1 gap-4">
-            <DifficultySelector
-              difficulties={difficulties}
-              register={register}
-            />
-            <div className="flex flex-col">
-              <label htmlFor="currentWeek" className="text-xl font-medium">
-                Current Week (Dev purposes only):
-              </label>
-              <input
-                required
-                type="number"
-                {...register("currentWeek")}
-                className="border rounded-md w-64 self-center"
-              />
-            </div>
-            {submissionState.notStarted?<button className="text-xl btn bg-blue-500 text-white py-2 px-4 rounded-lg self-center">
+  
+            <CurrentWeek register={register} />
+          </section>
+  
+          <section id="sow" className=" relative p-4 w-5/12 max-h-full flex flex-shrink">
+            <SchemeOfWork weeks={weeks} watch={watch} />
+          </section>
+        </div>
+          {submissionState.notStarted ? (
+            <button className="text-xl btn btn-primary py-2 px-4 rounded-lg self-center">
               Generate
-            </button>:<Loader width={75} height={75}/>}
-            </div>
-        </section>
-        <div className="flex flex-col items-center justify-center"></div>
-        <section id="sow" className="col-span-3">
-          <SchemeOfWork weeks={weeks} watch={watch} />
-        </section>
+            </button>
+          ) : (
+            <Loader width={75} height={75} />
+          )}
       </form>
     </>
   );

@@ -10,11 +10,11 @@ export const ContentTypeSelector = ({
   contentTypes,
   register,
 }: ContentTypeSelectorProps) => (
-  <>
+  <div className="flex flex-col rounded-md ">
     <h2 className="text-2xl">Content Type</h2>
-    <div className="grid grid-cols-2 grid-rows-2 place-items-center gap-1">
+    <div className="grid grid-cols-2 grid-rows-2 place-items-center gap-2">
       {Object.entries(contentTypes).map(([code, name]) => (
-        <div className="w-full" key={code}>
+        <div className="w-full flex flex-grow" key={code}>
           <input
             className="hidden peer"
             required
@@ -32,5 +32,5 @@ export const ContentTypeSelector = ({
         </div>
       ))}
     </div>
-  </>
+  </div>
 );

@@ -10,18 +10,18 @@ export const DifficultySelector = ({
   difficulties,
   register,
 }: DifficultySelectorProps) => (
-  <div className="flex flex-col px-4">
+  <div className="flex flex-col ">
     <h2 className="text-2xl">Difficulty</h2>
-    <div className="flex flex-wrap gap-3 p-2">
+    <div className="flex flex-wrap  gap-2">
       {difficulties.map((difficulty: string) => (
-        <div key={difficulty}>
+        <div key={difficulty} className="flex flex-grow">
           <input
           className="hidden peer"
             type="checkbox"
             id={difficulty}
             {...register(`difficulties.${difficulty}`)}
           />
-          <label htmlFor={difficulty} className="btn btn-outline peer-checked:btn-active peer-checked:text-white">{difficulty}</label>
+          <label htmlFor={difficulty} className="btn btn-outline peer-checked:btn-active peer-checked:text-white flex-grow">{difficulty}</label>
         </div>
       ))}
     </div>
