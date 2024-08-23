@@ -25,7 +25,7 @@ function App() {
     return <Login client={supabase} />;
   } else {
     return (
-      <main id='app-container' className="bg-base-300 flex flex-col h-screen w-full">
+      <main id='app-container' className="bg-base-300 flex flex-col min-h-100vh  h-screen w-full">
       <nav className="grid grid-cols-3 p-4 bg-secondary drop-shadow-md">
         {pathName && pathName !== "/" && (
           <HouseRounded

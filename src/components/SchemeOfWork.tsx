@@ -33,16 +33,15 @@ export default function SchemeOfWork({ weeks, watch }: SchemeOfWorkProps) {
           <div key={week.week_number} className="flex flex-nowrap gap-4 p-1">
             <div
               id={`${week.week_number}`}
-              className={`p-1 ${
+            >
+             <p className={`p-1 ${
                 week.week_number === +currentWeek
-                  ? "outline  rounded-xl"
+                  ? "badge-success rounded-full"
                   : week.week_number >= currentWeek - recallPeriod &&
                     week.week_number < currentWeek
-                  ? "outline outline-1 rounded-xl"
+                  ? "backdrop-brightness-90 rounded-full"
                   : ""
-              }`}
-            >
-             <p className="w-fit text-nowrap"> Week {week.week_number}:</p>
+              } w-fit text-nowrap`}> Week {week.week_number}:</p>
             </div>
             {[
               week.tags.map((tag) => (

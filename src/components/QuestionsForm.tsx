@@ -189,12 +189,12 @@ export default function QuestionsForm() {
     <>
       <form
         id="form"
-        className="grid grid-cols-[6fr_5fr] grid-rows-[7fr_3fr]  relative h-full"
+        className="grid grid-cols-[6fr_5fr] grid-rows-[8fr_2fr]  gap-4 relative h-full p-4"
         onSubmit={handleSubmit(onSubmit)}
       >
         <section
           id="controls"
-          className="p-4 col-start-1 col-span-1 flex flex-col gap-4 h-full max-h-[550px] border-r rounded-xl"
+          className="p-4 col-start-1 col-span-1 flex flex-col gap-4 h-full max-h-[550px] bg-base-200 rounded-xl"
         >
           <ClassSelector
             register={register}
@@ -219,7 +219,7 @@ export default function QuestionsForm() {
 
         <section
           id="sow"
-          className="  p-4 col-start-2 col-span-1 max-h-[550px] flex flex-shrink border-l rounded-xl"
+          className="bg-base-200  p-4 col-start-2 col-span-1 h-[550px] flex flex-shrink rounded-xl"
         >
           <SchemeOfWork weeks={weeks} watch={watch} />
         </section>
@@ -228,7 +228,7 @@ export default function QuestionsForm() {
             Generate
           </button>
         ) : (
-          <Loader width={75} height={75} />
+          <Loader width={75} height={75} className="my-auto mx-auto text-center place-content-center"/>
         )}
       </form>
     </>
