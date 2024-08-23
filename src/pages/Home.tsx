@@ -11,7 +11,7 @@ export default function Home() {
   const navigate = useNavigate();
   return (
     <>
-      <div className="flex self-center justify-center gap-2">
+      <div className="flex self-center justify-center gap-2 h-full">
         <div
           className="btn"
           onClick={() => {

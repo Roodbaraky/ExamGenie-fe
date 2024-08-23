@@ -124,7 +124,7 @@ export default function Upload() {
   return (
     <>
       {uploadStatus.success && (
-        <div className="self-center flex flex-col">
+        <div className="self-center flex flex-col h-full">
           <h2 className="text-2xl self-center">Success</h2>
           <div className="flex gap-2">
             <a
@@ -162,7 +162,7 @@ export default function Upload() {
       {uploadStatus.notStarted && (
         <form
           id="form"
-          className="flex flex-col gap-8 p-4"
+          className="flex flex-col gap-8 p-4 h-full"
           onSubmit={handleSubmit(onSubmit)}
         >
           <h2 className="text-2xl">Upload</h2>
