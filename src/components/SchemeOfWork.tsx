@@ -26,11 +26,11 @@ export default function SchemeOfWork({ weeks, watch }: SchemeOfWorkProps) {
       });
   }, [currentWeek]);
   return (
-    <div className="relative flex flex-col max-h-full ">
+    <div className="flex flex-col h-full max-h-full w-full ">
       <h2 className="text-2xl">Scheme of Work</h2>
-      <div className="relative overflow-scroll max-h-full p-4 border rounded-xl">
+      <div className=" overflow-scroll min-w-full h-full max-h-full p-4 rounded-xl">
         {weeks.map((week: Week) => (
-          <div key={week.week_number} className="flex gap-4 p-1">
+          <div key={week.week_number} className="flex flex-nowrap gap-4 p-1">
             <div
               id={`${week.week_number}`}
               className={`p-1 ${
@@ -42,7 +42,7 @@ export default function SchemeOfWork({ weeks, watch }: SchemeOfWorkProps) {
                   : ""
               }`}
             >
-              Week {week.week_number}:
+             <p className="w-fit text-nowrap"> Week {week.week_number}:</p>
             </div>
             {[
               week.tags.map((tag) => (

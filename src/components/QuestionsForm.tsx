@@ -187,42 +187,49 @@ export default function QuestionsForm() {
 
   return (
     <>
-      <form id="form" className="flex flex-col justify-evenly gap-4 h-full relative max-h-full" onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex gap-4 relative max-h-full
-        ">
-          <section id="controls" className="p-4 w-7/12 flex flex-col gap-4">
-            <ClassSelector
+      <form
+        id="form"
+        className="grid grid-cols-[6fr_5fr] grid-rows-[7fr_3fr]  relative h-full"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <section
+          id="controls"
+          className="p-4 col-start-1 col-span-1 flex flex-col gap-4 h-full max-h-[550px] border-r rounded-xl"
+        >
+          <ClassSelector
+            register={register}
+            setSelectedClass={setSelectedClass}
+          />
+          <ContentTypeSelector
+            register={register}
+            contentTypes={contentTypes}
+          />
+          <DifficultySelector difficulties={difficulties} register={register} />
+          <div className="flex justify-evenly">
+            <QuantitySelector
               register={register}
-              setSelectedClass={setSelectedClass}
+              setValue={setValue}
+              watch={watch}
             />
-            <ContentTypeSelector
-              register={register}
-              contentTypes={contentTypes}
-            />
-              <DifficultySelector difficulties={difficulties} register={register} />
-            <div className="flex justify-evenly">
-              <QuantitySelector
-                register={register}
-                setValue={setValue}
-                watch={watch}
-              />
-              <RecallPeriodSelector register={register} />
-            </div>
-  
-            <CurrentWeek register={register} />
-          </section>
-  
-          <section id="sow" className=" relative p-4 w-5/12 max-h-full flex flex-shrink">
-            <SchemeOfWork weeks={weeks} watch={watch} />
-          </section>
-        </div>
-          {submissionState.notStarted ? (
-            <button className="text-xl btn btn-primary py-2 px-4 rounded-lg self-center">
-              Generate
-            </button>
-          ) : (
-            <Loader width={75} height={75} />
-          )}
+            <RecallPeriodSelector register={register} />
+          </div>
+
+          <CurrentWeek register={register} />
+        </section>
+
+        <section
+          id="sow"
+          className="  p-4 col-start-2 col-span-1 max-h-[550px] flex flex-shrink border-l rounded-xl"
+        >
+          <SchemeOfWork weeks={weeks} watch={watch} />
+        </section>
+        {submissionState.notStarted ? (
+          <button className="text-xl btn btn-primary py-2 px-4 rounded-lg  col-span-2 my-auto mx-auto w-[60%] max-w-64">
+            Generate
+          </button>
+        ) : (
+          <Loader width={75} height={75} />
+        )}
       </form>
     </>
   );

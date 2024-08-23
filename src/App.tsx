@@ -25,9 +25,8 @@ function App() {
     return <Login client={supabase} />;
   } else {
     return (
-      <main className="bg-base-300 h-svh max-h-svh flex flex-col">
-     
-      <nav className="grid grid-cols-3 p-4 mb-10 bg-secondary drop-shadow-md">
+      <main id='app-container' className="bg-base-300 flex flex-col h-screen w-full">
+      <nav className="grid grid-cols-3 p-4 bg-secondary drop-shadow-md">
         {pathName && pathName !== "/" && (
           <HouseRounded
             className="col-start-1 col-span-1 self-center justify-self-center scale-125 cursor-pointer"
@@ -54,14 +53,15 @@ function App() {
           </div>
         )}
       </nav>
+     
   
-      <div className="max-h-full">
+      
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/upload" element={<Upload />} />
           <Route path="/questions" element={<QuestionsForm />} />
         </Routes>
-      </div>
+      
     </main>
     
     );
