@@ -56,15 +56,19 @@ export default function QuestionsForm() {
       className: "",
       difficulties: {},
       tags: [],
-      contentType: "",
+      contentType: undefined,
       quantity: 1,
       recallPeriod: 5,
-      currentWeek: 25,
+      currentWeek: 0,
       includeAnswers: false,
     },
+    mode: "onChange",
+    criteriaMode: "all",
   });
 
-  const { register, handleSubmit, setValue, watch } = form;
+  const { register, handleSubmit, setValue, watch, formState } = form;
+  const { isValid, isSubmitting } = formState;
+  const isSubmitDisabled = !isValid || weeks.length === 0 || isSubmitting;
   const postFilters = async (data: FormValues) => {
     if (!token) {
       console.error("No token found");
@@ -224,11 +228,18 @@ export default function QuestionsForm() {
           <SchemeOfWork weeks={weeks} watch={watch} />
         </section>
         {submissionState.notStarted ? (
-          <button className="text-xl btn btn-primary py-2 px-4 rounded-lg  col-span-2 my-auto mx-auto w-[60%] max-w-64">
+          <button
+            disabled={isSubmitDisabled}
+            className="text-xl btn btn-primary py-2 px-4 rounded-lg  col-span-2 my-auto mx-auto w-[60%] max-w-64"
+          >
             Generate
           </button>
         ) : (
-          <Loader width={75} height={75} className="my-auto mx-auto text-center place-content-center"/>
+          <Loader
+            width={75}
+            height={75}
+            className="my-auto mx-auto text-center place-content-center"
+          />
         )}
       </form>
     </>

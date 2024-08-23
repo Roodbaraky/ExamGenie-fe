@@ -16,12 +16,12 @@ export const ContentTypeSelector = ({
       {Object.entries(contentTypes).map(([code, name]) => (
         <div className="w-full flex flex-grow" key={code}>
           <input
-            className="hidden peer"
+            className="opacity-0 peer"
             required
             type="radio"
             id={code}
             value={code}
-            {...register("contentType")}
+            {...register("contentType", {required:true})}
           />
           <label
             htmlFor={code}

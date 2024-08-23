@@ -13,7 +13,7 @@ export default function CurrentWeek({ register }: CurrentWeekProps) {
       <input
         required
         type="number"
-        {...register("currentWeek")}
+        {...register("currentWeek", { min: 1, max: 39 })}
         className="border rounded-md w-64 self-center"
       />
     </div>
