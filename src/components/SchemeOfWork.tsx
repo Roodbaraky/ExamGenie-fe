@@ -33,9 +33,9 @@ export default function SchemeOfWork({
     });
   }, [currentWeek]);
   return (
-    <div className="flex h-full max-h-full w-full flex-col">
+    <div className="flex h-full max-h-full w-full max-w-[40vw] self-center flex-grow flex-col">
       <h2 className="text-2xl">Scheme of Work</h2>
-      <div className="h-full max-h-full min-w-full overflow-scroll rounded-xl p-4">
+      <div className="h-full max-h-full w-full overflow-scroll rounded-xl p-4">
         {isSuccess && weeks.length > 0 ? (
           weeks?.map((week: Week) => (
             <div key={week.week_number} className="flex flex-nowrap gap-4 p-1">

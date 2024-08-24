@@ -106,7 +106,7 @@ export default function Upload() {
         (
           document.getElementById(`auto-search-${i}`) as HTMLInputElement
         ).placeholder = "Please enter at least one tag";
-        return
+        return;
       }
     }
 
@@ -198,7 +198,7 @@ export default function Upload() {
               </div>
             ))}
             {(previewImgUrls?.length ?? 0) > 0 && (
-              <button className="btn">Upload</button>
+              <button className="btn btn-outline btn-lg w-fit self-center">Upload</button>
             )}
           </div>
         </form>

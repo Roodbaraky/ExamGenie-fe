@@ -165,7 +165,7 @@ export default function QuestionsForm() {
         </section>
         <section
           id="sow"
-          className="col-span-1 col-start-2 flex h-[590px] flex-shrink rounded-xl bg-base-200 p-4"
+          className="col-span-1 col-start-2 flex h-[590px] max-w-40vw flex-shrink rounded-xl bg-base-200 p-4"
         >
           <SchemeOfWork
             weeks={query?.data}
