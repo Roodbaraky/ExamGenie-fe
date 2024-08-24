@@ -1,8 +1,8 @@
 import { RestartAlt } from "@mui/icons-material";
 import { pdf } from "@react-pdf/renderer";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { saveAs } from "file-saver";
-import { MouseEvent, useState } from "react";
+import { MouseEvent } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../hooks/useAuth";
 import { dateFormatter } from "../utils/dateFormatter";
@@ -10,6 +10,7 @@ import ClassSelector from "./ClassSelector";
 import { ContentTypeSelector } from "./ContentTypeSelector";
 import CurrentWeek from "./CurrentWeek";
 import { DifficultySelector } from "./DifficultySelectors";
+import { Error } from "./Error";
 import Loader from "./Loader";
 import PDFFile from "./PDFFile";
 import QuantitySelector from "./QuantitySelector";
@@ -46,9 +47,6 @@ export default function QuestionsForm() {
 
   const { token } = useAuth();
 
-  const [isDownloadReady, setIsDownloadReady] = useState(false);
-  const [returnedData, setReturnedData] = useState();
-
   const form = useForm<FormValues>({
     defaultValues: {
       className: "",
@@ -66,17 +64,19 @@ export default function QuestionsForm() {
 
   const { register, handleSubmit, setValue, watch, formState } = form;
   const { isValid, isSubmitting } = formState;
-  const postFilters = async (data: FormValues) => {
-    if (!token) {
-      console.error("No token found");
-      return;
-    }
-
-    try {
+  const {
+    mutate,
+    isPending: isDataLoading,
+    isSuccess: isDataSuccess,
+    data: returnedData,
+    isError,
+    error,
+    reset,
+  } = useMutation({
+    mutationFn: async (data: FormValues) => {
       let apiURL = `http://127.0.0.1:3001/questions`;
-      
       if (+data.quantity >= 1) apiURL += `?limit=${data.quantity}`;
-      
+
       const response = await fetch(apiURL, {
         method: "POST",
         headers: {
@@ -85,25 +85,14 @@ export default function QuestionsForm() {
         },
         body: JSON.stringify(data),
       });
-      
+
       if (!response.ok) {
-        throw new Error(`Response status: ${response.status}`);
+        throw Error({ text: `Response status: ${response.status}` });
       }
 
-      const returnedData = await response.json();
-      
-      console.log("returnedData: ", returnedData);
-  
-      setIsDownloadReady(true);
-      
-      return returnedData;
-    } catch (error) {
-      console.error("Error posting filters:", error);
-
-      
-      return Promise.reject(error);
-    }
-  };
+      return response.json();
+    },
+  });
   const handleDownload = async (e: MouseEvent) => {
     const format = form.getValues("contentType");
     const className = form.getValues("className");
@@ -123,17 +112,11 @@ export default function QuestionsForm() {
     ).toBlob();
     saveAs(blob, `${className} ${format} ${dateFormatter()}`);
   };
-  
+
   const onSubmit = async (data: FormValues) => {
-    console.log("Submitted Data:", data);
-    try {
-      const response = await postFilters(data);
-      setReturnedData(response);
-    } catch (error) {
-      console.error("Error during form submission:", (error as Error).message);
-    }
+    mutate(data);
   };
-  
+
   const className = watch("className");
   const query = useQuery({
     queryKey: [className],
@@ -145,12 +128,13 @@ export default function QuestionsForm() {
           Authorization: `Bearer ${token}`,
         },
       }).then((res) => res.json()),
-      enabled: !!className,
-    });
-    const isSubmitDisabled = !isValid || query?.data.length === 0 || isSubmitting;
-    
-    const { isLoading, isSuccess } = query;
-    
+    enabled: !!className,
+  });
+  const isSubmitDisabled =
+    !isValid || query?.data?.length === 0 || isSubmitting;
+
+  const { isLoading, isSuccess } = query;
+
   return (
     <>
       <form
@@ -162,9 +146,7 @@ export default function QuestionsForm() {
           id="controls"
           className="col-span-1 col-start-1 flex h-full max-h-[590px] flex-col gap-4 rounded-xl bg-base-200 p-4"
         >
-          <ClassSelector
-            register={register}
-          />
+          <ClassSelector register={register} />
           <ContentTypeSelector
             register={register}
             contentTypes={contentTypes}
@@ -181,7 +163,6 @@ export default function QuestionsForm() {
 
           <CurrentWeek register={register} />
         </section>
-
         <section
           id="sow"
           className="col-span-1 col-start-2 flex h-[590px] flex-shrink rounded-xl bg-base-200 p-4"
@@ -193,14 +174,19 @@ export default function QuestionsForm() {
             isSuccess={isSuccess}
           />
         </section>
-        {!isDownloadReady ? (
+        {!isDataSuccess && (
           <button
             disabled={isSubmitDisabled}
             className="btn btn-primary btn-lg col-span-2 mx-auto my-auto w-[60%] max-w-64 rounded-lg px-4 py-2 text-3xl"
           >
-            Generate
+            {!isDataLoading ? (
+              <span>Generate</span>
+            ) : (
+              <span className="loading loading-spinner"></span>
+            )}
           </button>
-        ) : isDownloadReady ? (
+        )}
+        {isDataSuccess && (
           <div className="col-span-2 col-start-1 mx-auto flex gap-4 self-center">
             <a id="q-download" className="btn btn-lg" onClick={handleDownload}>
               Download Questions
@@ -211,20 +197,22 @@ export default function QuestionsForm() {
             <a
               className="btn btn-outline btn-lg"
               onClick={() => {
-                setIsDownloadReady(false);
                 form.reset();
+                reset();
               }}
             >
               <RestartAlt />
             </a>
           </div>
-        ) : (
+        )}{" "}
+        {isDataLoading && (
           <Loader
             width={75}
             height={75}
             className="col-span-2 col-start-1 mx-auto my-auto place-content-center self-center text-center"
           />
         )}
+        {isError && <Error text={error.message} />}
       </form>
     </>
   );
