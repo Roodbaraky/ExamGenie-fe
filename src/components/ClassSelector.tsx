@@ -1,8 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-  Dispatch,
-  SetStateAction
-} from "react";
 import { UseFormRegister } from "react-hook-form";
 import { useAuth } from "../hooks/useAuth";
 import ClassesSkeleton from "./ClassesSkeleton";
@@ -16,12 +12,8 @@ export interface Class {
 
 interface ClassSelectorProps {
   register: UseFormRegister<FormValues>;
-  setSelectedClass: Dispatch<SetStateAction<string>>;
 }
-export default function ClassSelector({
-  register,
-  setSelectedClass,
-}: ClassSelectorProps) {
+export default function ClassSelector({ register }: ClassSelectorProps) {
   const { token } = useAuth();
 
   const query = useQuery({
@@ -51,11 +43,7 @@ export default function ClassSelector({
                 id={classItem.class_name}
                 value={classItem.class_name}
                 className="peer absolute opacity-0"
-                {...register(`className`, {
-                  onChange: (e) => {
-                    setSelectedClass(e.target.value);
-                  },
-                })}
+                {...register(`className`)}
               />
               <label
                 htmlFor={classItem.class_name}

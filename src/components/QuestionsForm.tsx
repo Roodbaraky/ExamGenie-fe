@@ -1,7 +1,8 @@
 import { RestartAlt } from "@mui/icons-material";
 import { pdf } from "@react-pdf/renderer";
+import { useQuery } from "@tanstack/react-query";
 import { saveAs } from "file-saver";
-import { MouseEvent, useCallback, useEffect, useState } from "react";
+import { MouseEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../hooks/useAuth";
 import { dateFormatter } from "../utils/dateFormatter";
@@ -13,7 +14,7 @@ import Loader from "./Loader";
 import PDFFile from "./PDFFile";
 import QuantitySelector from "./QuantitySelector";
 import RecallPeriodSelector from "./RecallPeriodSelector";
-import SchemeOfWork, { Week } from "./SchemeOfWork";
+import SchemeOfWork from "./SchemeOfWork";
 
 export interface FormValues {
   className: string;
@@ -44,13 +45,7 @@ export default function QuestionsForm() {
   };
 
   const { token } = useAuth();
-  const [weeks, setWeeks] = useState<Week[]>([]);
-  const [selectedClass, setSelectedClass] = useState<string>("");
-  const [submissionState, setSubmissionState] = useState({
-    notStarted: true,
-    isPending: false,
-    isComplete: false,
-  });
+
   const [isDownloadReady, setIsDownloadReady] = useState(false);
   const [returnedData, setReturnedData] = useState();
 
@@ -71,22 +66,17 @@ export default function QuestionsForm() {
 
   const { register, handleSubmit, setValue, watch, formState } = form;
   const { isValid, isSubmitting } = formState;
-  const isSubmitDisabled = !isValid || weeks.length === 0 || isSubmitting;
   const postFilters = async (data: FormValues) => {
     if (!token) {
       console.error("No token found");
       return;
     }
-    setSubmissionState({
-      ...submissionState,
-      notStarted: false,
-      isPending: true,
-    });
+
     try {
       let apiURL = `http://127.0.0.1:3001/questions`;
-
+      
       if (+data.quantity >= 1) apiURL += `?limit=${data.quantity}`;
-
+      
       const response = await fetch(apiURL, {
         method: "POST",
         headers: {
@@ -95,31 +85,22 @@ export default function QuestionsForm() {
         },
         body: JSON.stringify(data),
       });
-
+      
       if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
       }
 
       const returnedData = await response.json();
-
+      
       console.log("returnedData: ", returnedData);
-      setSubmissionState({
-        ...submissionState,
-        isPending: false,
-        isComplete: true,
-      });
+  
       setIsDownloadReady(true);
-
+      
       return returnedData;
     } catch (error) {
       console.error("Error posting filters:", error);
-      setSubmissionState({
-        ...submissionState,
-        notStarted: true,
-        isPending: false,
-        isComplete: false,
-      });
 
+      
       return Promise.reject(error);
     }
   };
@@ -142,7 +123,7 @@ export default function QuestionsForm() {
     ).toBlob();
     saveAs(blob, `${className} ${format} ${dateFormatter()}`);
   };
-
+  
   const onSubmit = async (data: FormValues) => {
     console.log("Submitted Data:", data);
     try {
@@ -152,45 +133,24 @@ export default function QuestionsForm() {
       console.error("Error during form submission:", (error as Error).message);
     }
   };
-
-  const populateWeeks = useCallback(
-    async (className: string) => {
-      if (!token) {
-        console.error("No token found");
-        return;
-      }
-
-      try {
-        const response = await fetch(
-          `http://127.0.0.1:3001/weeks?className=${className}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error(`Response status: ${response.status}`);
-        }
-
-        const weeks = await response.json();
-        setWeeks(weeks);
-      } catch (error) {
-        console.error("Error fetching weeks:", (error as Error).message);
-      }
-    },
-    [token],
-  );
-
-  useEffect(() => {
-    if (selectedClass) {
-      populateWeeks(selectedClass);
-    }
-  }, [populateWeeks, selectedClass]);
-
+  
+  const className = watch("className");
+  const query = useQuery({
+    queryKey: [className],
+    queryFn: () =>
+      fetch(`http://127.0.0.1:3001/weeks?className=${className}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }).then((res) => res.json()),
+      enabled: !!className,
+    });
+    const isSubmitDisabled = !isValid || query?.data.length === 0 || isSubmitting;
+    
+    const { isLoading, isSuccess } = query;
+    
   return (
     <>
       <form
@@ -204,7 +164,6 @@ export default function QuestionsForm() {
         >
           <ClassSelector
             register={register}
-            setSelectedClass={setSelectedClass}
           />
           <ContentTypeSelector
             register={register}
@@ -227,9 +186,14 @@ export default function QuestionsForm() {
           id="sow"
           className="col-span-1 col-start-2 flex h-[590px] flex-shrink rounded-xl bg-base-200 p-4"
         >
-          <SchemeOfWork weeks={weeks} watch={watch} />
+          <SchemeOfWork
+            weeks={query?.data}
+            watch={watch}
+            isLoading={isLoading}
+            isSuccess={isSuccess}
+          />
         </section>
-        {submissionState.notStarted && !isDownloadReady ? (
+        {!isDownloadReady ? (
           <button
             disabled={isSubmitDisabled}
             className="btn btn-primary btn-lg col-span-2 mx-auto my-auto w-[60%] max-w-64 rounded-lg px-4 py-2 text-3xl"
