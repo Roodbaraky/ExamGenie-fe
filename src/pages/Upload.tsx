@@ -105,12 +105,12 @@ export default function Upload() {
   return (
     <>
       {isSuccess && (
-        <div className="flex h-full flex-col self-center">
-          <h2 className="self-center text-2xl">Success</h2>
+        <div className="flex h-full flex-col self-center justify-center gap-16">
+          <h2 className="self-center text-3xl">Upload succesful.</h2>
           <div className="flex gap-2">
             <a
               href=""
-              className="btn"
+              className="btn btn-lg"
               onClick={(e) => {
                 e.preventDefault();
                 setPreviewimgUrls([]);
@@ -122,7 +122,7 @@ export default function Upload() {
             </a>
             <a
               href=""
-              className="btn"
+              className="btn btn-lg"
               onClick={(e) => {
                 e.preventDefault();
 
@@ -134,14 +134,14 @@ export default function Upload() {
           </div>
         </div>
       )}
-      {isPending && <Loader width={90} height={90} />}
+      {isPending && <div className="flex flex-col justify-center items-center h-full"><Loader width={90} height={90} /></div>}
       {!isPending && !isSuccess && (
         <form
           id="form"
           className="flex h-full flex-col gap-8 p-4"
           onSubmit={handleSubmit(onSubmit)}
         >
-          <h2 className="text-2xl">Upload</h2>
+          <h2 className="text-3xl">Upload</h2>
           <input
             className="file-input file-input-bordered w-80"
             type="file"
