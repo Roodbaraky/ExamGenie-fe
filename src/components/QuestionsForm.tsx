@@ -1,12 +1,7 @@
 import { RestartAlt } from "@mui/icons-material";
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
-import {
-  MouseEvent,
-  useCallback,
-  useEffect,
-  useState
-} from "react";
+import { MouseEvent, useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../hooks/useAuth";
 import { dateFormatter } from "../utils/dateFormatter";
@@ -113,7 +108,6 @@ export default function QuestionsForm() {
         isPending: false,
         isComplete: true,
       });
-      // form.reset();
       setIsDownloadReady(true);
 
       return returnedData;
@@ -141,10 +135,10 @@ export default function QuestionsForm() {
   const generatePDF = async (
     format: string,
     className: string,
-    questionURLs: Question[]
+    questionURLs: Question[],
   ) => {
     const blob = await pdf(
-      <PDFFile format={format} questionURLs={questionURLs} />
+      <PDFFile format={format} questionURLs={questionURLs} />,
     ).toBlob();
     saveAs(blob, `${className} ${format} ${dateFormatter()}`);
   };
@@ -175,7 +169,7 @@ export default function QuestionsForm() {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         if (!response.ok) {
@@ -188,7 +182,7 @@ export default function QuestionsForm() {
         console.error("Error fetching weeks:", (error as Error).message);
       }
     },
-    [token]
+    [token],
   );
 
   useEffect(() => {
@@ -201,12 +195,12 @@ export default function QuestionsForm() {
     <>
       <form
         id="form"
-        className="grid grid-cols-[6fr_5fr] grid-rows-[8fr_2fr]  gap-4 relative h-full p-4"
+        className="relative grid h-full grid-cols-[6fr_5fr] grid-rows-[8fr_2fr] gap-4 p-4"
         onSubmit={handleSubmit(onSubmit)}
       >
         <section
           id="controls"
-          className="p-4 col-start-1 col-span-1 flex flex-col gap-4 h-full max-h-[590px] bg-base-200 rounded-xl"
+          className="col-span-1 col-start-1 flex h-full max-h-[590px] flex-col gap-4 rounded-xl bg-base-200 p-4"
         >
           <ClassSelector
             register={register}
@@ -231,19 +225,19 @@ export default function QuestionsForm() {
 
         <section
           id="sow"
-          className="bg-base-200  p-4 col-start-2 col-span-1 h-[590px] flex flex-shrink rounded-xl"
+          className="col-span-1 col-start-2 flex h-[590px] flex-shrink rounded-xl bg-base-200 p-4"
         >
           <SchemeOfWork weeks={weeks} watch={watch} />
         </section>
         {submissionState.notStarted && !isDownloadReady ? (
           <button
             disabled={isSubmitDisabled}
-            className="text-3xl btn btn-primary btn-lg py-2 px-4 rounded-lg  col-span-2 my-auto mx-auto w-[60%] max-w-64"
+            className="btn btn-primary btn-lg col-span-2 mx-auto my-auto w-[60%] max-w-64 rounded-lg px-4 py-2 text-3xl"
           >
             Generate
           </button>
         ) : isDownloadReady ? (
-          <div className="flex gap-4 self-center mx-auto col-start-1 col-span-2">
+          <div className="col-span-2 col-start-1 mx-auto flex gap-4 self-center">
             <a id="q-download" className="btn btn-lg" onClick={handleDownload}>
               Download Questions
             </a>
@@ -251,7 +245,7 @@ export default function QuestionsForm() {
               Download Answers
             </a>
             <a
-              className="btn btn-lg btn-outline"
+              className="btn btn-outline btn-lg"
               onClick={() => {
                 setIsDownloadReady(false);
                 form.reset();
@@ -264,7 +258,7 @@ export default function QuestionsForm() {
           <Loader
             width={75}
             height={75}
-            className="my-auto mx-auto text-center place-content-center col-span-2 col-start-1 self-center"
+            className="col-span-2 col-start-1 mx-auto my-auto place-content-center self-center text-center"
           />
         )}
       </form>
