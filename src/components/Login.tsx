@@ -9,9 +9,9 @@ interface LoginProps {
 export default function Login({ client }: LoginProps) {
   return (
     <div className="flex flex-col">
-      <h1 className="text-7xl text-center">ExamGenie</h1>
-      <div className="flex flex-col self-center min-w-[320px] justify-center mt-24">
-        <h2 className="text-2xl text-center">Log in</h2>
+      <h1 className="text-center text-7xl">ExamGenie</h1>
+      <div className="mt-24 flex min-w-[320px] flex-col justify-center self-center">
+        <h2 className="text-center text-2xl">Log in</h2>
         <Auth
           supabaseClient={client}
           appearance={{ theme: ThemeSupa }}

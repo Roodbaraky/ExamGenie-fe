@@ -1,29 +1,22 @@
-import { ChangeEventHandler, useCallback, useEffect, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { ChangeEventHandler, useState } from "react";
 import { useForm } from "react-hook-form";
-import CustomizedHook from "../components/AutocompleteSearch";
-import { Tag, UploadFormValues } from "../types/types";
-import { useAuth } from "../hooks/useAuth";
-import Loader from "../components/Loader";
 import { useNavigate } from "react-router-dom";
+import CustomizedHook from "../components/AutocompleteSearch";
+import Loader from "../components/Loader";
+import { useAuth } from "../hooks/useAuth";
+import { UploadFormValues } from "../types/types";
 
 export default function Upload() {
-  const [, setSelectedImages] = useState<FileList>();
   const [previewImgUrls, setPreviewimgUrls] = useState<string[]>();
-  const [tags, setTags] = useState<Tag[]>();
-  const [uploadStatus, setUploadStatus] = useState({
-    notStarted: true,
-    pending: false,
-    success: false,
-  });
   const difficulties = ["foundation", "crossover", "higher", "crossover"];
   const { token } = useAuth();
   const navigate = useNavigate();
 
   const handleFileChange: ChangeEventHandler<HTMLInputElement> = async (
-    event
+    event,
   ) => {
     const files = event.target.files as FileList;
-    setSelectedImages(files);
     if (!files) {
       return;
     }
@@ -48,28 +41,6 @@ export default function Upload() {
       reader.onload = () => resolve(reader.result as string);
     });
   };
-  const populateTags = useCallback(async () => {
-    try {
-      const response = await fetch(`http://127.0.0.1:3001/tags`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error(`Response status: ${response.status}`);
-      }
-      const tags = await response.json();
-      setTags(tags);
-    } catch (error) {
-      console.error((error as Error).message);
-    }
-  }, [token]);
-
-  useEffect(() => {
-    populateTags();
-  }, [populateTags]);
 
   const form = useForm<UploadFormValues>({
     defaultValues: {
@@ -80,6 +51,18 @@ export default function Upload() {
   });
 
   const { register, handleSubmit, setValue } = form;
+
+  const query = useQuery({
+    queryKey: ["tags"],
+    queryFn: () =>
+      fetch(`http://127.0.0.1:3001/tags`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }).then((res) => res.json()),
+  });
 
   const postQuestions = async (data: UploadFormValues) => {
     const { tags, difficulty, images } = data;
@@ -105,41 +88,34 @@ export default function Upload() {
     const questionIds = await response.json();
     if (!questionIds.length) {
       console.log("this shouldnt happen");
-      setUploadStatus({ ...uploadStatus, pending: false, notStarted: true });
 
       throw Error("Error uploading questions");
-    } else {
-      setUploadStatus({ success: true, pending: false, notStarted: false });
     }
+    console.log("returnedData: ", questionIds);
+    return questionIds;
   };
+  const { mutate, isPending, isSuccess, reset } = useMutation({
+    mutationFn: postQuestions,
+  });
+
   const onSubmit = async (data: UploadFormValues) => {
     console.log("Uploaded Data:", data);
-    try {
-      setUploadStatus({ ...uploadStatus, pending: true, notStarted: false });
-      await postQuestions(data);
-    } catch (error) {
-      console.error((error as Error).message);
-    }
+    mutate(data);
   };
   return (
     <>
-      {uploadStatus.success && (
-        <div className="self-center flex flex-col h-full">
-          <h2 className="text-2xl self-center">Success</h2>
+      {isSuccess && (
+        <div className="flex h-full flex-col self-center">
+          <h2 className="self-center text-2xl">Success</h2>
           <div className="flex gap-2">
             <a
               href=""
               className="btn"
               onClick={(e) => {
                 e.preventDefault();
-                setSelectedImages(undefined);
                 setPreviewimgUrls([]);
+                reset();
                 form.reset();
-                setUploadStatus({
-                  notStarted: true,
-                  success: false,
-                  pending: false,
-                });
               }}
             >
               Start Again
@@ -149,7 +125,7 @@ export default function Upload() {
               className="btn"
               onClick={(e) => {
                 e.preventDefault();
-                
+
                 navigate("/");
               }}
             >
@@ -158,11 +134,11 @@ export default function Upload() {
           </div>
         </div>
       )}
-      {uploadStatus.pending && <Loader width={90} height={90} />}
-      {uploadStatus.notStarted && (
+      {isPending && <Loader width={90} height={90} />}
+      {!isPending && !isSuccess && (
         <form
           id="form"
-          className="flex flex-col gap-8 p-4 h-full"
+          className="flex h-full flex-col gap-8 p-4"
           onSubmit={handleSubmit(onSubmit)}
         >
           <h2 className="text-2xl">Upload</h2>
@@ -171,19 +147,20 @@ export default function Upload() {
             type="file"
             accept="image/*"
             multiple
-            //see if it works with RHF just?
-            //   {...register("image")}
             onChange={handleFileChange}
           />
           <div className="flex flex-col gap-2">
             {previewImgUrls?.map((previewImgUrl: string, index) => (
               <div key={previewImgUrl + index} className="flex gap-2">
-                <img className="max-w-52 w-52 max-h-36 rounded" src={previewImgUrl} />
+                <img
+                  className="max-h-36 w-52 max-w-52 rounded"
+                  src={previewImgUrl}
+                />
                 <div className="flex flex-col">
                   <label htmlFor="difficulties"></label>
                   <select
                     id=""
-                    className="rounded h-8"
+                    className="h-8 rounded"
                     {...register(`difficulty.${index}`)}
                   >
                     {difficulties.map((difficulty, index2) => (
@@ -196,7 +173,7 @@ export default function Upload() {
                     ))}
                   </select>
                   <CustomizedHook
-                    tags={tags ?? []}
+                    tags={query?.data ?? ["error loading tags"]}
                     index={index}
                     setValue={setValue}
                     key={previewImgUrl + index}

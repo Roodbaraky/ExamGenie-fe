@@ -41,7 +41,7 @@ export default function SchemeOfWork({
               <div id={`${week.week_number}`}>
                 <p
                   className={`p-1 ${
-                    week.week_number === +currentWeek
+                    week?.week_number === +currentWeek
                       ? "badge-success rounded-full"
                       : week.week_number >= currentWeek - recallPeriod &&
                           week.week_number < currentWeek
