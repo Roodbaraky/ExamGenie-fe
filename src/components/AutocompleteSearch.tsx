@@ -3,13 +3,11 @@ import {
   useAutocomplete,
 } from "@mui/base/useAutocomplete";
 import CheckIcon from "@mui/icons-material/Check";
-import CloseIcon from "@mui/icons-material/Close";
 import { autocompleteClasses } from "@mui/material/Autocomplete";
 import { styled } from "@mui/material/styles";
 import { useEffect } from "react";
 import { UseFormSetValue } from "react-hook-form";
-import { UploadFormValues, Tag as CustomTag } from "../types/types";
-import { CloseSharp, Delete } from "@mui/icons-material";
+import { Tag as CustomTag, UploadFormValues } from "../types/types";
 
 const Root = styled("div")(
   ({ theme }) => `
@@ -17,7 +15,7 @@ const Root = styled("div")(
     theme.palette.mode === "dark" ? "rgba(255,255,255,0.65)" : "rgba(0,0,0,.85)"
   };
   font-size: 14px;
-`
+`,
 );
 
 const Label = styled("label")`
@@ -62,7 +60,7 @@ const InputWrapper = styled("div")(
     margin: 0;
     outline: 0;
   }
-`
+`,
 );
 
 interface TagProps extends ReturnType<AutocompleteGetTagProps> {
@@ -74,8 +72,9 @@ function Tag(props: TagProps) {
   return (
     <div {...other}>
       <span>{label}</span>
-      <a onClick={onDelete} className="mx-1 cursor-pointer font-thin">{' x '}</a>
-      
+      <a onClick={onDelete} className="mx-1 cursor-pointer font-thin">
+        {" x "}
+      </a>
     </div>
   );
 }
@@ -113,7 +112,7 @@ const StyledTag = styled(Tag)<TagProps>(
     cursor: pointer;
     padding: 4px;
   }
-`
+`,
 );
 
 const Listbox = styled("ul")(
@@ -160,10 +159,10 @@ const Listbox = styled("ul")(
       color: currentColor;
     }
   }
-`
+`,
 );
 
-export default function CustomizedHook({
+export default function AutoCompleteSearch({
   tags,
   index,
   setValue,
@@ -184,7 +183,7 @@ export default function CustomizedHook({
     focused,
     setAnchorEl,
   } = useAutocomplete({
-    id: "customized-hook-demo",
+    id:`auto-search-${index}`,
     defaultValue: [],
     multiple: true,
     options: tags.map((tag) => tag.tag),
@@ -217,7 +216,7 @@ export default function CustomizedHook({
               <li key={key} {...optionProps}>
                 {/* @ts-expect-error: Unreachable code error */}
                 <span>{option}</span>
-                <CheckIcon fontSize="small"/>
+                <CheckIcon fontSize="small" />
               </li>
             );
           })}

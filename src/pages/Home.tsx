@@ -11,24 +11,24 @@ export default function Home() {
   const navigate = useNavigate();
   return (
     <>
-      <div className="flex self-center justify-center gap-2 h-full">
+      <div className="flex self-center items-center justify-center gap-4 h-full">
         <div
-          className="btn"
+          className="btn btn-lg"
           onClick={() => {
             navigate("/questions");
           }}
         >
-          Questions
+          Generate Questions
         </div>
         <div
-          className={`btn ${
+          className={`btn btn-lg ${
             user_role && user_role === "admin" ? "" : "btn-disabled"
           }`}
           onClick={() => {
             if (user_role === "admin") navigate("/upload");
           }}
         >
-          Upload
+          Upload Questions
         </div>
       </div>
     </>

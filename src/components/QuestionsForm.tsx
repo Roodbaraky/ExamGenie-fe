@@ -187,7 +187,7 @@ export default function QuestionsForm() {
           </button>
         )}
         {isDataSuccess && (
-          <div className="col-span-2 col-start-1 mx-auto flex gap-4 self-center">
+          <div className="col-span-2 col-start-1 mx-auto flex gap-4 self-center items-center">
             <a id="q-download" className="btn btn-lg" onClick={handleDownload}>
               Download Questions
             </a>
@@ -201,7 +201,13 @@ export default function QuestionsForm() {
                 reset();
               }}
             >
-              <RestartAlt />
+              Reset <RestartAlt />
+            </a>
+            <a
+              className="btn btn-outline btn-lg"
+              onClick={handleSubmit((d) => {onSubmit(d)})}
+            >
+              Generate More
             </a>
           </div>
         )}{" "}

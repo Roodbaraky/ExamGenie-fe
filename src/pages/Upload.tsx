@@ -2,7 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChangeEventHandler, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import CustomizedHook from "../components/AutocompleteSearch";
+import AutoCompleteSearch from "../components/AutocompleteSearch";
 import Loader from "../components/Loader";
 import { useAuth } from "../hooks/useAuth";
 import { UploadFormValues } from "../types/types";
@@ -50,7 +50,7 @@ export default function Upload() {
     },
   });
 
-  const { register, handleSubmit, setValue } = form;
+  const { register, handleSubmit, setValue, watch } = form;
 
   const query = useQuery({
     queryKey: ["tags"],
@@ -99,13 +99,24 @@ export default function Upload() {
   });
 
   const onSubmit = async (data: UploadFormValues) => {
+    const selectedTags = watch("tags");
+    if (!selectedTags.length) return;
+    for (let i = 0; i < selectedTags.length; i++) {
+      if (!selectedTags[i]?.length) {
+        (
+          document.getElementById(`auto-search-${i}`) as HTMLInputElement
+        ).placeholder = "Please enter at least one tag";
+        return
+      }
+    }
+
     console.log("Uploaded Data:", data);
     mutate(data);
   };
   return (
     <>
       {isSuccess && (
-        <div className="flex h-full flex-col self-center justify-center gap-16">
+        <div className="flex h-full flex-col justify-center gap-16 self-center">
           <h2 className="self-center text-3xl">Upload succesful.</h2>
           <div className="flex gap-2">
             <a
@@ -134,7 +145,11 @@ export default function Upload() {
           </div>
         </div>
       )}
-      {isPending && <div className="flex flex-col justify-center items-center h-full"><Loader width={90} height={90} /></div>}
+      {isPending && (
+        <div className="flex h-full flex-col items-center justify-center">
+          <Loader width={90} height={90} />
+        </div>
+      )}
       {!isPending && !isSuccess && (
         <form
           id="form"
@@ -159,6 +174,7 @@ export default function Upload() {
                 <div className="flex flex-col">
                   <label htmlFor="difficulties"></label>
                   <select
+                    required
                     id=""
                     className="h-8 rounded"
                     {...register(`difficulty.${index}`)}
@@ -172,7 +188,7 @@ export default function Upload() {
                       </option>
                     ))}
                   </select>
-                  <CustomizedHook
+                  <AutoCompleteSearch
                     tags={query?.data ?? ["error loading tags"]}
                     index={index}
                     setValue={setValue}

@@ -11,8 +11,8 @@ export interface Week {
 interface SchemeOfWorkProps {
   weeks: Week[];
   watch: UseFormWatch<FormValues>;
-  isSuccess:boolean;
-  isLoading:boolean
+  isSuccess: boolean;
+  isLoading: boolean;
 }
 export default function SchemeOfWork({
   weeks,
@@ -23,6 +23,7 @@ export default function SchemeOfWork({
   weeks?.sort((a, b) => a.week_number - b.week_number);
   const currentWeek = watch("currentWeek");
   const recallPeriod = watch("recallPeriod");
+  const className = watch("className");
 
   useEffect(() => {
     document.getElementById(`${currentWeek}`)?.scrollIntoView({
@@ -35,7 +36,7 @@ export default function SchemeOfWork({
     <div className="flex h-full max-h-full w-full flex-col">
       <h2 className="text-2xl">Scheme of Work</h2>
       <div className="h-full max-h-full min-w-full overflow-scroll rounded-xl p-4">
-        {isSuccess &&
+        {isSuccess && weeks.length > 0 ? (
           weeks?.map((week: Week) => (
             <div key={week.week_number} className="flex flex-nowrap gap-4 p-1">
               <div id={`${week.week_number}`}>
@@ -64,7 +65,18 @@ export default function SchemeOfWork({
                 </a>,
               ]}
             </div>
-          ))}
+          ))
+        ) : !isLoading && className.length > 0 ? (
+          <div className="flex h-full flex-col items-center justify-center self-center text-center">
+            No scheme of work found for this class.
+          </div>
+        ) : (
+          !isLoading && (
+            <div className="flex h-full flex-col items-center justify-center self-center text-center">
+              Select a class to load scheme of work
+            </div>
+          )
+        )}
         {isLoading && <SchemeOfWorkSkeleton />}
       </div>
     </div>
