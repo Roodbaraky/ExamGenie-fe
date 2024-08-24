@@ -1,25 +1,24 @@
+import { RestartAlt } from "@mui/icons-material";
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import {
   MouseEvent,
-  PointerEvent,
   useCallback,
   useEffect,
-  useState,
+  useState
 } from "react";
 import { useForm } from "react-hook-form";
+import { useAuth } from "../hooks/useAuth";
 import { dateFormatter } from "../utils/dateFormatter";
 import ClassSelector from "./ClassSelector";
 import { ContentTypeSelector } from "./ContentTypeSelector";
+import CurrentWeek from "./CurrentWeek";
 import { DifficultySelector } from "./DifficultySelectors";
+import Loader from "./Loader";
 import PDFFile from "./PDFFile";
 import QuantitySelector from "./QuantitySelector";
 import RecallPeriodSelector from "./RecallPeriodSelector";
 import SchemeOfWork, { Week } from "./SchemeOfWork";
-import { useAuth } from "../hooks/useAuth";
-import Loader from "./Loader";
-import CurrentWeek from "./CurrentWeek";
-import { RestartAlt } from "@mui/icons-material";
 
 export interface FormValues {
   className: string;

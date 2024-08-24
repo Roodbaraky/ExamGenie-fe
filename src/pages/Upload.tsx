@@ -167,7 +167,7 @@ export default function Upload() {
         >
           <h2 className="text-2xl">Upload</h2>
           <input
-            className="rounded-xl"
+            className="file-input file-input-bordered w-80"
             type="file"
             accept="image/*"
             multiple

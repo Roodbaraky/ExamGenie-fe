@@ -1,8 +1,15 @@
 import { UseFormRegister } from "react-hook-form";
 import { FormValues } from "./QuestionsForm";
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { useAuth } from "../hooks/useAuth";
 import Loader from "./Loader";
+import ClassesSkeleton from "./ClassesSkeleton";
 
 export interface Class {
   id: number;
@@ -19,14 +26,14 @@ export default function ClassSelector({
   setSelectedClass,
 }: ClassSelectorProps) {
   const [classes, setClasses] = useState<Class[] | []>([]);
-  const {token} = useAuth();
-  const populateClasses = useCallback( async () => {
+  const { token } = useAuth();
+  const populateClasses = useCallback(async () => {
     try {
       const response = await fetch(`http://127.0.0.1:3001/classes`, {
-        method:'GET',
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       if (!response.ok) {
@@ -37,7 +44,7 @@ export default function ClassSelector({
     } catch (error) {
       console.error((error as Error).message);
     }
-  },[token])
+  }, [token]);
 
   useEffect(() => {
     populateClasses();
@@ -46,24 +53,33 @@ export default function ClassSelector({
   return (
     <div className="flex flex-col justify-evenly">
       <h2 className="text-2xl">Classes</h2>
-      <div className="flex gap-2 flex-wrap justify-evenly">
-        {classes.length?classes.map((classItem) => (
-          <div key={classItem.id} className="flex flex-grow">
-            <input
-              required
-              type="radio"
-              id={classItem.class_name}
-              value={classItem.class_name}
-              className="opacity-0 absolute peer"
-              {...register(`className`, {
-                onChange: (e) => {
-                  setSelectedClass(e.target.value);
-                },
-              })}
-            />
-              <label htmlFor={classItem.class_name} className="btn btn-outline peer-checked:btn-active peer-checked:text-white flex-grow">{classItem.class_name}</label>
-          </div>
-        )):<Loader width={75} height={75} className="self-center mx-auto"/>}
+      <div className="flex flex-wrap justify-evenly gap-2">
+        {classes.length ? (
+          classes.map((classItem) => (
+            <div key={classItem.id} className="flex flex-grow">
+              <input
+                required
+                type="radio"
+                id={classItem.class_name}
+                value={classItem.class_name}
+                className="peer absolute opacity-0"
+                {...register(`className`, {
+                  onChange: (e) => {
+                    setSelectedClass(e.target.value);
+                  },
+                })}
+              />
+              <label
+                htmlFor={classItem.class_name}
+                className="btn btn-outline flex-grow peer-checked:btn-active peer-checked:text-white"
+              >
+                {classItem.class_name}
+              </label>
+            </div>
+          ))
+        ) : (
+          <ClassesSkeleton />
+        )}
       </div>
     </div>
   );
