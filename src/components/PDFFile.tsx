@@ -94,7 +94,7 @@ export default function PDFFile({ questionURLs, format }: PDFFileProps) {
         orientation={format.includes("QSTR") ? "landscape" : "portrait"}
       >
         {questionURLs.map((questionObject: Question, index: number) => (
-          <Image key={index} src={questionObject.URL} style={styles.img}/>
+          <Image key={index} src={questionObject?.URL??'https://1080motion.com/wp-content/uploads/2018/06/NoImageFound.jpg.png'} style={styles.img}/>
         ))}
       </Page>
     </Document>
