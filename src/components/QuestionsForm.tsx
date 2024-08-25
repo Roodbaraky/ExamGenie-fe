@@ -10,7 +10,7 @@ import ClassSelector from "./ClassSelector";
 import { ContentTypeSelector } from "./ContentTypeSelector";
 import CurrentWeek from "./CurrentWeek";
 import { DifficultySelector } from "./DifficultySelectors";
-import { Error } from "./Error";
+import { Error as ErrorComponent } from "./Error";
 import PDFFile from "./PDFFile";
 import QuantitySelector from "./QuantitySelector";
 import RecallPeriodSelector from "./RecallPeriodSelector";
@@ -87,7 +87,8 @@ export default function QuestionsForm() {
       });
 
       if (!response.ok) {
-        throw Error({ text: `Response status: ${response.status}` });
+        console.log(response)
+        throw Error(`${response.status}: ${response.statusText}`);
       }
 
       return response.json();
@@ -213,7 +214,7 @@ export default function QuestionsForm() {
             </a>
           </div>
         )}
-        {isError && <Error text={error.message} />}
+        {isError && <ErrorComponent message={error.message} />}
       </form>
     </>
   );
