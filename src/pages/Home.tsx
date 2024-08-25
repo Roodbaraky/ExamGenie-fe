@@ -1,13 +1,8 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
 export default function Home() {
   const { user_role } = useAuth();
-
-  useEffect(() => {
-    console.log(user_role);
-  }, [user_role]);
   const navigate = useNavigate();
   return (
     <>

@@ -139,7 +139,7 @@ export default function QuestionsForm() {
     <>
       <form
         id="form"
-        className="relative grid h-full grid-cols-[6fr_5fr] grid-rows-[8fr_2fr] gap-4 p-4"
+        className="relative bg-base-300 grid max-h-screen grid-cols-[6fr_5fr] grid-rows-[8fr_2fr] gap-4 p-4"
         onSubmit={handleSubmit(onSubmit)}
       >
         <section

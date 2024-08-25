@@ -9,6 +9,7 @@ import { useAuth } from "./hooks/useAuth";
 import Home from "./pages/Home";
 import Upload from "./pages/Upload";
 import { supabase } from "./utils/supabaseClient";
+import { Navbar } from "./components/Navbar";
 
 const queryClient = new QueryClient();
 
@@ -34,34 +35,7 @@ function App() {
           id="app-container"
           className="min-h-100vh flex h-screen w-full flex-col bg-base-300"
         >
-          <nav className="grid grid-cols-3 bg-secondary p-4 drop-shadow-md">
-            {pathName && pathName !== "/" && (
-              <HouseRounded
-                className="col-span-1 col-start-1 scale-125 cursor-pointer self-center justify-self-center"
-                onClick={() => {
-                  navigate("/");
-                }}
-              />
-            )}
-            <h1 className="col-span-1 col-start-2 h-fit w-fit self-center justify-self-center rounded-xl text-center text-7xl">
-              ExamGenie
-            </h1>
-            {session && (
-              <div className="flex items-center gap-2 self-center justify-self-center">
-                <h2>{user_role}</h2>
-                <a
-                  className="btn h-fit w-fit"
-                  onClick={() => {
-                    setToken(null);
-                    window.location.reload();
-                  }}
-                >
-                  Log out
-                </a>
-              </div>
-            )}
-          </nav>
-
+          <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/upload" element={<Upload />} />
