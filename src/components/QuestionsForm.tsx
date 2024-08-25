@@ -87,7 +87,6 @@ export default function QuestionsForm() {
       });
 
       if (!response.ok) {
-        console.log(response)
         throw Error(`${response.status}: ${response.statusText}`);
       }
 

@@ -47,7 +47,7 @@ export default function ClassSelector({ register }: ClassSelectorProps) {
               />
               <label
                 htmlFor={classItem.class_name}
-                className="btn btn-outline flex-grow peer-checked:btn-active peer-checked:text-white"
+                className="btn btn-outline flex-grow max-w-20 peer-checked:btn-active peer-checked:text-white"
               >
                 {classItem.class_name}
               </label>
