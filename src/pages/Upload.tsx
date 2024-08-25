@@ -32,7 +32,7 @@ export default function Upload() {
       console.log(error);
     }
   };
-
+  
   const fileToDataString = (file: File) => {
     return new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
@@ -49,9 +49,10 @@ export default function Upload() {
       images: undefined,
     },
   });
-
+  
   const { register, handleSubmit, setValue, watch } = form;
-
+  
+  const selectedTags = watch("tags");
   const query = useQuery({
     queryKey: ["tags"],
     queryFn: () =>
@@ -99,13 +100,18 @@ export default function Upload() {
   });
 
   const onSubmit = async (data: UploadFormValues) => {
-    const selectedTags = watch("tags");
     if (!selectedTags.length) return;
     for (let i = 0; i < selectedTags.length; i++) {
       if (!selectedTags[i]?.length) {
-        (
-          document.getElementById(`auto-search-${i}`) as HTMLInputElement
-        ).placeholder = "Please enter at least one tag";
+        const input = document.getElementById(
+          `auto-search-${i}`,
+        ) as HTMLInputElement;
+        input.placeholder = "Please enter at least one tag";
+        input.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+          inline: "nearest",
+        });
         return;
       }
     }
@@ -146,25 +152,25 @@ export default function Upload() {
         </div>
       )}
       {isPending && (
-        <div className="flex h-full flex-col items-center justify-center">
+        <div className="flex h-full min-h-fit flex-col items-center justify-center">
           <Loader width={90} height={90} />
         </div>
       )}
       {!isPending && !isSuccess && (
         <form
           id="form"
-          className="flex h-full flex-col gap-8 p-4"
+          className="m-4 flex h-fit min-h-full flex-col gap-8 rounded-xl bg-base-100 p-4"
           onSubmit={handleSubmit(onSubmit)}
         >
           <h2 className="text-3xl">Upload</h2>
           <input
-            className="file-input file-input-bordered w-80"
+            className="file-input file-input-bordered h-10 min-h-10 w-80"
             type="file"
             accept="image/*"
             multiple
             onChange={handleFileChange}
           />
-          <div className="flex flex-col gap-2">
+          <div className="flex max-h-full flex-col gap-2 object-contain">
             {previewImgUrls?.map((previewImgUrl: string, index) => (
               <div key={previewImgUrl + index} className="flex gap-2">
                 <img
@@ -197,10 +203,14 @@ export default function Upload() {
                 </div>
               </div>
             ))}
-            {(previewImgUrls?.length ?? 0) > 0 && (
-              <button className="btn btn-outline btn-lg w-fit self-center">Upload</button>
-            )}
           </div>
+          {(previewImgUrls?.length ?? 0) > 0 && (
+            <button
+              className={`btn btn-primary btn-lg mt-10 ${ selectedTags?.every((tags)=>tags.length>0)? "" : "btn-disabled"} relative bottom-4 w-[20%] self-center rounded-lg`}
+            >
+              Upload
+            </button>
+          )}
         </form>
       )}
     </>

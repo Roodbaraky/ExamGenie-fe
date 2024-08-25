@@ -1,22 +1,20 @@
-import { HouseRounded } from "@mui/icons-material";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { Footer } from "./components/Footer";
 import Login from "./components/Login";
+import { Navbar } from "./components/Navbar";
 import QuestionsForm from "./components/QuestionsForm";
 import { useAuth } from "./hooks/useAuth";
 import Home from "./pages/Home";
 import Upload from "./pages/Upload";
 import { supabase } from "./utils/supabaseClient";
-import { Navbar } from "./components/Navbar";
 
 const queryClient = new QueryClient();
 
 function App() {
-  const { session, user_role, setToken } = useAuth();
+  const { session } = useAuth();
   const navigate = useNavigate();
-  const pathName = window.location.pathname;
 
   useEffect(() => {
     if (!session) {
@@ -33,7 +31,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <main
           id="app-container"
-          className="min-h-100vh flex h-screen w-full flex-col bg-base-300"
+          className="flex h-screen  w-full flex-col bg-base-300"
         >
           <Navbar />
           <Routes>
@@ -42,7 +40,7 @@ function App() {
             <Route path="/questions" element={<QuestionsForm />} />
           </Routes>
 
-          <Footer className="relative bottom-0 mx-auto w-full" />
+          <Footer className=" self-end mt-auto mx-auto w-full" />
         </main>
       </QueryClientProvider>
     );

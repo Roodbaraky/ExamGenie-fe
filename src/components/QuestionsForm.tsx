@@ -11,7 +11,6 @@ import { ContentTypeSelector } from "./ContentTypeSelector";
 import CurrentWeek from "./CurrentWeek";
 import { DifficultySelector } from "./DifficultySelectors";
 import { Error } from "./Error";
-import Loader from "./Loader";
 import PDFFile from "./PDFFile";
 import QuantitySelector from "./QuantitySelector";
 import RecallPeriodSelector from "./RecallPeriodSelector";
@@ -66,6 +65,7 @@ export default function QuestionsForm() {
   const { isValid, isSubmitting } = formState;
   const {
     mutate,
+    isIdle,
     isPending: isDataLoading,
     isSuccess: isDataSuccess,
     data: returnedData,
@@ -139,7 +139,7 @@ export default function QuestionsForm() {
     <>
       <form
         id="form"
-        className="relative bg-base-300 grid max-h-screen grid-cols-[6fr_5fr] grid-rows-[8fr_2fr] gap-4 p-4"
+        className="relative grid max-h-screen grid-cols-[6fr_5fr] grid-rows-[8fr_2fr] gap-4 bg-base-300 p-4"
         onSubmit={handleSubmit(onSubmit)}
       >
         <section
@@ -165,7 +165,7 @@ export default function QuestionsForm() {
         </section>
         <section
           id="sow"
-          className="col-span-1 col-start-2 flex h-[590px] max-w-40vw flex-shrink rounded-xl bg-base-200 p-4"
+          className="max-w-40vw col-span-1 col-start-2 flex h-[590px] flex-shrink rounded-xl bg-base-200 p-4"
         >
           <SchemeOfWork
             weeks={query?.data}
@@ -174,7 +174,7 @@ export default function QuestionsForm() {
             isSuccess={isSuccess}
           />
         </section>
-        {!isDataSuccess && (
+        {(!isDataSuccess ||isIdle)&& (
           <button
             disabled={isSubmitDisabled}
             className="btn btn-primary btn-lg col-span-2 mx-auto my-auto w-[60%] max-w-64 rounded-lg px-4 py-2 text-3xl"
@@ -187,7 +187,7 @@ export default function QuestionsForm() {
           </button>
         )}
         {isDataSuccess && (
-          <div className="col-span-2 col-start-1 mx-auto flex gap-4 self-center items-center">
+          <div className="col-span-2 col-start-1 mx-auto flex items-center gap-4 self-center">
             <a id="q-download" className="btn btn-lg" onClick={handleDownload}>
               Download Questions
             </a>
@@ -205,18 +205,13 @@ export default function QuestionsForm() {
             </a>
             <a
               className="btn btn-outline btn-lg"
-              onClick={handleSubmit((d) => {onSubmit(d)})}
+              onClick={handleSubmit((d) => {
+                onSubmit(d);
+              })}
             >
               Generate More
             </a>
           </div>
-        )}{" "}
-        {isDataLoading && (
-          <Loader
-            width={75}
-            height={75}
-            className="col-span-2 col-start-1 mx-auto my-auto place-content-center self-center text-center"
-          />
         )}
         {isError && <Error text={error.message} />}
       </form>

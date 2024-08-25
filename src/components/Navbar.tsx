@@ -16,10 +16,10 @@ export const Navbar = () => {
       ExamGenie
     </h1>
     {session && (
-      <div className="col-start-3 flex items-center gap-2 self-center justify-self-end">
-        <h2>{user_role}</h2>
+      <div className="col-start-3 flex items-end gap-2 self-center justify-self-end">
+        <h2 className="badge badge-secondary h-fit w-fit">{user_role}</h2>
         <a
-          className="btn h-fit w-fit"
+          className="badge badge-secondary hover:badge-primary h-fit w-fit cursor-pointer"
           onClick={() => {
             setToken(null);
             window.location.reload();

@@ -56,7 +56,7 @@ export default function SchemeOfWork({
               </div>
               {[
                 week?.tags?.map((tag) => (
-                  <a key={tag} className="btn">
+                  <a key={tag} className="btn ">
                     {tag.replace(/-/g, " ")}
                   </a>
                 )),

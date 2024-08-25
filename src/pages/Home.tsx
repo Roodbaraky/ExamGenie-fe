@@ -5,8 +5,8 @@ export default function Home() {
   const { user_role } = useAuth();
   const navigate = useNavigate();
   return (
-    <>
-      <div className="flex self-center items-center justify-center gap-4 h-full">
+    <div className="flex flex-col h-full items-center justify-center">
+      <div className="flex self-center  gap-4 h-fit">
         <div
           className="btn btn-lg"
           onClick={() => {
@@ -15,6 +15,7 @@ export default function Home() {
         >
           Generate Questions
         </div>
+        <div className="divider divider-horizontal"></div>
         <div
           className={`btn btn-lg ${
             user_role && user_role === "admin" ? "" : "btn-disabled"
@@ -26,6 +27,6 @@ export default function Home() {
           Upload Questions
         </div>
       </div>
-    </>
+    </div>
   );
 }
