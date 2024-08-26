@@ -1,6 +1,6 @@
 import { RestartAlt } from "@mui/icons-material";
 import { pdf } from "@react-pdf/renderer";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { saveAs } from "file-saver";
 import { MouseEvent } from "react";
 import { useForm } from "react-hook-form";
@@ -14,7 +14,7 @@ import { Error as ErrorComponent } from "./Error";
 import PDFFile from "./PDFFile";
 import QuantitySelector from "./QuantitySelector";
 import RecallPeriodSelector from "./RecallPeriodSelector";
-import SchemeOfWork from "./SchemeOfWork";
+import SchemeOfWork, { Week } from "./SchemeOfWork";
 const API_URL=import.meta.env.VITE_API_URL
 
 export interface FormValues {
@@ -61,6 +61,7 @@ export default function QuestionsForm() {
     mode: "onChange",
     criteriaMode: "all",
   });
+  const queryClient = useQueryClient();
 
   const { register, handleSubmit, setValue, watch, formState } = form;
   const { isValid, isSubmitting } = formState;
@@ -118,6 +119,39 @@ export default function QuestionsForm() {
     mutate(data);
   };
 
+  const updateWeeksMutation = useMutation({
+    mutationFn: (updatedWeeks: Week[]) =>
+      fetch(`${API_URL}/sow`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({className, weeks:updatedWeeks}),
+      }).then((res) => res.json()),
+    onMutate: async (newWeeks) => {
+      await queryClient.cancelQueries({ queryKey: [className] });
+      const previousWeeks = queryClient.getQueryData([className]);
+      queryClient.setQueryData([className], newWeeks);
+      return { previousWeeks };
+    },
+    onError: (err, newWeeks, context) => {
+      queryClient.setQueryData([className], context?.previousWeeks);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: [className] });
+    },
+  });
+
+  const onUpdateWeeks = async (updatedWeeks: Week[]) => {
+    try {
+      await updateWeeksMutation.mutateAsync(updatedWeeks);
+    } catch (error) {
+      console.error('Failed to update weeks:', error);
+  
+    }
+  };
+
   const className = watch("className");
   const query = useQuery({
     queryKey: [className],
@@ -173,6 +207,7 @@ export default function QuestionsForm() {
             watch={watch}
             isLoading={isLoading}
             isSuccess={isSuccess}
+            onUpdateWeeks={onUpdateWeeks}
           />
         </section>
         {(!isDataSuccess ||isIdle)&& (
