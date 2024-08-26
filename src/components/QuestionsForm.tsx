@@ -15,6 +15,7 @@ import PDFFile from "./PDFFile";
 import QuantitySelector from "./QuantitySelector";
 import RecallPeriodSelector from "./RecallPeriodSelector";
 import SchemeOfWork from "./SchemeOfWork";
+const API_URL=import.meta.env.VITE_API_URL
 
 export interface FormValues {
   className: string;
@@ -74,7 +75,7 @@ export default function QuestionsForm() {
     reset,
   } = useMutation({
     mutationFn: async (data: FormValues) => {
-      let apiURL = `http://127.0.0.1:3001/questions`;
+      let apiURL = `${API_URL}/questions`;
       if (+data.quantity >= 1) apiURL += `?limit=${data.quantity}`;
 
       const response = await fetch(apiURL, {
@@ -121,7 +122,7 @@ export default function QuestionsForm() {
   const query = useQuery({
     queryKey: [className],
     queryFn: () =>
-      fetch(`http://127.0.0.1:3001/weeks?className=${className}`, {
+      fetch(`${API_URL}/weeks?className=${className}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

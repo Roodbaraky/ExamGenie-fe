@@ -3,7 +3,7 @@ import { UseFormRegister } from "react-hook-form";
 import { useAuth } from "../hooks/useAuth";
 import ClassesSkeleton from "./ClassesSkeleton";
 import { FormValues } from "./QuestionsForm";
-
+const API_URL=import.meta.env.VITE_API_URL
 export interface Class {
   id: number;
   class_name: string;
@@ -19,7 +19,7 @@ export default function ClassSelector({ register }: ClassSelectorProps) {
   const query = useQuery({
     queryKey: ["classes"],
     queryFn: () =>
-      fetch(`http://127.0.0.1:3001/classes`, {
+      fetch(`${API_URL}/classes`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
