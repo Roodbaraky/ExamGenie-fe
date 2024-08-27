@@ -1,6 +1,6 @@
 import { RestartAlt } from "@mui/icons-material";
 import { pdf } from "@react-pdf/renderer";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { saveAs } from "file-saver";
 import { MouseEvent } from "react";
 import { useForm } from "react-hook-form";
@@ -14,8 +14,8 @@ import { Error as ErrorComponent } from "./Error";
 import PDFFile from "./PDFFile";
 import QuantitySelector from "./QuantitySelector";
 import RecallPeriodSelector from "./RecallPeriodSelector";
-import SchemeOfWork, { Week } from "./SchemeOfWork";
-const API_URL=import.meta.env.VITE_API_URL
+import SchemeOfWork from "./SchemeOfWork";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export interface FormValues {
   className: string;
@@ -61,8 +61,6 @@ export default function QuestionsForm() {
     mode: "onChange",
     criteriaMode: "all",
   });
-  const queryClient = useQueryClient();
-
   const { register, handleSubmit, setValue, watch, formState } = form;
   const { isValid, isSubmitting } = formState;
   const {
@@ -119,39 +117,6 @@ export default function QuestionsForm() {
     mutate(data);
   };
 
-  const updateWeeksMutation = useMutation({
-    mutationFn: (updatedWeeks: Week[]) =>
-      fetch(`${API_URL}/sow`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({className, weeks:updatedWeeks}),
-      }).then((res) => res.json()),
-    onMutate: async (newWeeks) => {
-      await queryClient.cancelQueries({ queryKey: [className] });
-      const previousWeeks = queryClient.getQueryData([className]);
-      queryClient.setQueryData([className], newWeeks);
-      return { previousWeeks };
-    },
-    onError: (err, newWeeks, context) => {
-      queryClient.setQueryData([className], context?.previousWeeks);
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: [className] });
-    },
-  });
-
-  const onUpdateWeeks = async (updatedWeeks: Week[]) => {
-    try {
-      await updateWeeksMutation.mutateAsync(updatedWeeks);
-    } catch (error) {
-      console.error('Failed to update weeks:', error);
-  
-    }
-  };
-
   const className = watch("className");
   const query = useQuery({
     queryKey: [className],
@@ -165,6 +130,7 @@ export default function QuestionsForm() {
       }).then((res) => res.json()),
     enabled: !!className,
   });
+
   const isSubmitDisabled =
     !isValid || query?.data?.length === 0 || isSubmitting;
 
@@ -207,10 +173,10 @@ export default function QuestionsForm() {
             watch={watch}
             isLoading={isLoading}
             isSuccess={isSuccess}
-            onUpdateWeeks={onUpdateWeeks}
+            refetch={query?.refetch}
           />
         </section>
-        {(!isDataSuccess ||isIdle)&& (
+        {(!isDataSuccess || isIdle) && (
           <button
             disabled={isSubmitDisabled}
             className="btn btn-primary btn-lg col-span-2 mx-auto my-auto w-[60%] max-w-64 rounded-lg px-4 py-2 text-3xl"

@@ -4,7 +4,12 @@ import { FormValues } from "./QuestionsForm";
 import SchemeOfWorkSkeleton from "./SchemeOfWorkSkeleton";
 import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "../hooks/useAuth";
-import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "react-beautiful-dnd";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -18,7 +23,7 @@ interface SchemeOfWorkProps {
   watch: UseFormWatch<FormValues>;
   isSuccess: boolean;
   isLoading: boolean;
-  onUpdateWeeks: (updatedWeeks: Week[]) => void;
+  refetch: () => void;
 }
 
 export default function SchemeOfWork({
@@ -26,7 +31,7 @@ export default function SchemeOfWork({
   watch,
   isSuccess,
   isLoading,
-  onUpdateWeeks,
+  refetch,
 }: SchemeOfWorkProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [localWeeks, setLocalWeeks] = useState<Week[]>([]);
@@ -37,7 +42,9 @@ export default function SchemeOfWork({
 
   useEffect(() => {
     if (Array.isArray(weeks)) {
-      const sortedWeeks = [...weeks].sort((a, b) => a.week_number - b.week_number);
+      const sortedWeeks = [...weeks].sort(
+        (a, b) => a.week_number - b.week_number,
+      );
       setLocalWeeks(sortedWeeks);
     }
   }, [weeks]);
@@ -60,7 +67,7 @@ export default function SchemeOfWork({
     isError,
     error,
   } = useMutation({
-    mutationFn: async (data: { className: string, weeks: Week[] }) => {
+    mutationFn: async (data: { className: string; weeks: Week[] }) => {
       const response = await fetch(`${API_URL}/sow`, {
         method: "POST",
         headers: {
@@ -77,99 +84,118 @@ export default function SchemeOfWork({
       const result = await response.json();
       return {
         sow_id: result.sow_id,
-        weeks: result.weeks // Assuming the backend returns the updated weeks
+        weeks: result.weeks,
       };
     },
   });
 
   const handleSave = async () => {
     try {
-      const result = await mutateAsync({ className, weeks: localWeeks });
-      // setLocalWeeks(result.weeks);
-      // onUpdateWeeks(result.weeks);
-      console.log(result);
+      await mutateAsync({ className, weeks: localWeeks });
       setIsEditing(false);
+      refetch();
     } catch (error) {
-      console.error('Error updating backend:', error);
+      console.error("Error updating backend:", error);
     }
   };
 
-  const onDragEnd = useCallback((result: DropResult) => {
-    if (!result.destination) return;
-  
-    const { source, destination } = result;
-    const newWeeks = Array.from(localWeeks);
-    const sourceIndex = parseInt(source.droppableId, 10);
-    const destIndex = parseInt(destination.droppableId, 10);
-    const [reorderedTag] = newWeeks[sourceIndex].tags.splice(source.index, 1);
-    newWeeks[destIndex].tags.splice(destination.index, 0, reorderedTag);
-  
-    setLocalWeeks(newWeeks);
-  }, [localWeeks]);
-
-
+  const onDragEnd = useCallback(
+    (result: DropResult) => {
+      if (!result.destination) return;
+      const { source, destination } = result;
+      const newWeeks = Array.from(localWeeks);
+      const sourceIndex = parseInt(source.droppableId, 10);
+      const destIndex = parseInt(destination.droppableId, 10);
+      const [reorderedTag] = newWeeks[sourceIndex].tags.splice(source.index, 1);
+      newWeeks[destIndex].tags.splice(destination.index, 0, reorderedTag);
+      setLocalWeeks(newWeeks);
+    },
+    [localWeeks],
+  );
 
   return (
     <div className="flex h-full max-h-full w-full max-w-[45vw] flex-grow flex-col self-center">
-      <div className="flex justify-between items-center mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <h2 className="text-2xl">Scheme of Work</h2>
         {isSuccess && localWeeks.length > 0 && (
           <div>
             {isEditing ? (
-              <a onClick={handleSave} className="btn btn-primary mr-2">Save</a>
+              isPending
+              ?<a className="btn btn-primary"><span className=" loading-spinner loading"></span></a>
+              :<a onClick={handleSave} className="btn btn-primary">
+                Save
+              </a>
             ) : (
-              <a onClick={() => setIsEditing(true)} className="btn btn-secondary">Edit</a>
+              <a
+                onClick={() => setIsEditing(true)}
+                className="btn btn-secondary"
+              >
+                Edit
+              </a>
             )}
           </div>
         )}
       </div>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="h-full max-h-full w-full overflow-scroll rounded-xl p-4">
-          {isSuccess && localWeeks.length > 0 ? (
-            localWeeks.map((week, weekIndex) => (
-              <Droppable key={`week-${week.week_number}`} droppableId={weekIndex.toString()}>
-                {(provided) => (
-                  <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className="flex flex-nowrap gap-4 p-1"
-                  >
-                    <div id={`week-${week.week_number}`}>
-                      <p className={`p-1 ${
-                        week.week_number === +currentWeek
-                          ? "badge-success rounded-full"
-                          : week.week_number >= +currentWeek - recallPeriod &&
-                            week.week_number < +currentWeek
-                            ? "rounded-full backdrop-brightness-90"
-                            : ""
-                      } w-fit text-nowrap`}>
-                        Week {week.week_number}:
-                      </p>
+          {isSuccess && localWeeks.length > 0
+            ? localWeeks.map((week, weekIndex) => (
+                <Droppable
+                  key={`week-${week.week_number}`}
+                  droppableId={weekIndex.toString()}
+                >
+                  {(provided) => (
+                    <div
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      className="flex flex-nowrap gap-4 p-1"
+                    >
+                      <div id={`week-${week.week_number}`}>
+                        <p
+                          className={`p-1 ${
+                            week.week_number === +currentWeek
+                              ? "badge-success rounded-full"
+                              : week.week_number >=
+                                    +currentWeek - recallPeriod &&
+                                  week.week_number < +currentWeek
+                                ? "rounded-full backdrop-brightness-90"
+                                : ""
+                          } w-fit text-nowrap`}
+                        >
+                          Week {week.week_number}:
+                        </p>
+                      </div>
+                      {week.tags.map((tag, index) => (
+                        <Draggable
+                          key={`${week.week_number}-${tag}`}
+                          draggableId={`${week.week_number}-${tag}`}
+                          index={index}
+                          isDragDisabled={!isEditing}
+                        >
+                          {(provided) => (
+                            <a
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className={`btn ${isEditing ? "cursor-grab" : "cursor-default"}`}
+                            >
+                              {tag.replace(/-/g, " ")}
+                            </a>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
                     </div>
-                    {week.tags.map((tag, index) => (
-                      <Draggable key={`${week.week_number}-${tag}`} draggableId={`${week.week_number}-${tag}`} index={index} isDragDisabled={!isEditing}>
-                        {(provided) => (
-                          <a
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className={`btn ${isEditing ? '' : 'cursor-default'}`}
-                          >
-                            {tag.replace(/-/g, " ")}
-                          </a>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            ))
-          ) : (
-            !isLoading && (<div className="flex h-full flex-col items-center justify-center self-center text-center">
-              {className ? "No scheme of work found for this class." : "Select a class to load scheme of work"}
-            </div>)
-          )}
+                  )}
+                </Droppable>
+              ))
+            : !isLoading && (
+                <div className="flex h-full flex-col items-center justify-center self-center text-center">
+                  {className
+                    ? "No scheme of work found for this class."
+                    : "Select a class to load scheme of work"}
+                </div>
+              )}
         </div>
         {isLoading && <SchemeOfWorkSkeleton />}
       </DragDropContext>
