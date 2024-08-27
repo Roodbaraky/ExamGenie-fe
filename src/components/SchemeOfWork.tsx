@@ -60,13 +60,7 @@ export default function SchemeOfWork({
     }
   }, [currentWeek]);
 
-  const {
-    mutateAsync,
-    isPending,
-    isSuccess: isMutateSuccess,
-    isError,
-    error,
-  } = useMutation({
+  const { mutateAsync, isPending } = useMutation({
     mutationFn: async (data: { className: string; weeks: Week[] }) => {
       const response = await fetch(`${API_URL}/sow`, {
         method: "POST",
@@ -120,11 +114,15 @@ export default function SchemeOfWork({
         {isSuccess && localWeeks.length > 0 && (
           <div>
             {isEditing ? (
-              isPending
-              ?<a className="btn btn-primary"><span className=" loading-spinner loading"></span></a>
-              :<a onClick={handleSave} className="btn btn-primary">
-                Save
-              </a>
+              isPending ? (
+                <a className="btn btn-primary">
+                  <span className="loading loading-spinner"></span>
+                </a>
+              ) : (
+                <a onClick={handleSave} className="btn btn-primary">
+                  Save
+                </a>
+              )
             ) : (
               <a
                 onClick={() => setIsEditing(true)}
@@ -138,66 +136,66 @@ export default function SchemeOfWork({
       </div>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="h-full max-h-full w-full overflow-scroll rounded-xl p-4">
-          {isSuccess && localWeeks.length > 0
-            ? localWeeks.map((week, weekIndex) => (
-                <Droppable
-                  key={`week-${week.week_number}`}
-                  droppableId={weekIndex.toString()}
-                >
-                  {(provided) => (
-                    <div
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                      className="flex flex-nowrap gap-4 p-1"
-                    >
-                      <div id={`week-${week.week_number}`}>
-                        <p
-                          className={`p-1 ${
-                            week.week_number === +currentWeek
-                              ? "badge-success rounded-full"
-                              : week.week_number >=
-                                    +currentWeek - recallPeriod &&
-                                  week.week_number < +currentWeek
-                                ? "rounded-full backdrop-brightness-90"
-                                : ""
-                          } w-fit text-nowrap`}
-                        >
-                          Week {week.week_number}:
-                        </p>
-                      </div>
-                      {week.tags.map((tag, index) => (
-                        <Draggable
-                          key={`${week.week_number}-${tag}`}
-                          draggableId={`${week.week_number}-${tag}`}
-                          index={index}
-                          isDragDisabled={!isEditing}
-                        >
-                          {(provided) => (
-                            <a
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              className={`btn ${isEditing ? "cursor-grab" : "cursor-default"}`}
-                            >
-                              {tag.replace(/-/g, " ")}
-                            </a>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
+          {isSuccess && localWeeks.length > 0 ? (
+            localWeeks.map((week, weekIndex) => (
+              <Droppable
+                key={`week-${week.week_number}`}
+                droppableId={weekIndex.toString()}
+              >
+                {(provided) => (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="flex flex-nowrap gap-4 p-1"
+                  >
+                    <div id={`week-${week.week_number}`}>
+                      <p
+                        className={`p-1 ${
+                          week.week_number === +currentWeek
+                            ? "badge-success rounded-full"
+                            : week.week_number >= +currentWeek - recallPeriod &&
+                                week.week_number < +currentWeek
+                              ? "rounded-full backdrop-brightness-90"
+                              : ""
+                        } w-fit text-nowrap`}
+                      >
+                        Week {week.week_number}:
+                      </p>
                     </div>
-                  )}
-                </Droppable>
-              ))
-            : !isLoading && (
-                <div className="flex h-full flex-col items-center justify-center self-center text-center">
-                  {className
-                    ? "No scheme of work found for this class."
-                    : "Select a class to load scheme of work"}
-                </div>
-              )}
+                    {week.tags.map((tag, index) => (
+                      <Draggable
+                        key={`${week.week_number}-${tag}`}
+                        draggableId={`${week.week_number}-${tag}`}
+                        index={index}
+                        isDragDisabled={!isEditing}
+                      >
+                        {(provided) => (
+                          <a
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className={`btn ${isEditing ? "cursor-grab" : "cursor-default"}`}
+                          >
+                            {tag.replace(/-/g, " ")}
+                          </a>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            ))
+          ) : !isLoading ? (
+            <div className="flex h-full flex-col items-center justify-center self-center text-center">
+              {className
+                ? "No scheme of work found for this class."
+                : "Select a class to load scheme of work"}
+            </div>
+          ) : (
+            <SchemeOfWorkSkeleton />
+          )}
         </div>
-        {isLoading && <SchemeOfWorkSkeleton />}
       </DragDropContext>
     </div>
   );
