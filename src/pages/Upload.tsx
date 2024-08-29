@@ -9,6 +9,9 @@ import { UploadFormValues } from "../types/types";
 
 export default function Upload() {
   const [previewImgUrls, setPreviewimgUrls] = useState<string[]>();
+  const [previewAnswerImgUrls, setPreviewAnswerImgUrls] = useState<string[]>();
+  const [isNextClicked, setIsNextClicked] = useState<boolean>(false);
+
   const difficulties = ["foundation", "crossover", "higher", "crossover"];
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -20,19 +23,31 @@ export default function Upload() {
     if (!files) {
       return;
     }
+
     try {
       const filePromises = [];
       for (let i = 0; i < files.length; i++) {
         filePromises.push(fileToDataString(files.item(i)!));
       }
       const imgUrls = await Promise.all(filePromises);
+      if (isNextClicked) {
+        setPreviewAnswerImgUrls(imgUrls);
+        setValue("answerImages", imgUrls);
+        return;
+      }
       setPreviewimgUrls(imgUrls);
       setValue("images", imgUrls);
     } catch (error) {
       console.log(error);
     }
   };
-  
+
+  const handleNext = () => {
+    console.log("next");
+    (document.getElementById("image-input") as HTMLInputElement).value = "";
+    setIsNextClicked(true);
+  };
+
   const fileToDataString = (file: File) => {
     return new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
@@ -47,11 +62,12 @@ export default function Upload() {
       difficulty: [],
       tags: undefined,
       images: undefined,
+      answerImages: undefined,
     },
   });
-  
+
   const { register, handleSubmit, setValue, watch } = form;
-  
+
   const selectedTags = watch("tags");
   const query = useQuery({
     queryKey: ["tags"],
@@ -66,12 +82,13 @@ export default function Upload() {
   });
 
   const postQuestions = async (data: UploadFormValues) => {
-    const { tags, difficulty, images } = data;
+    const { tags, difficulty, images, answerImages } = data;
     const imagesToUpload = images.map((image: string, index) => {
       return {
         image,
         difficulty: difficulty[index],
         tags: tags[index],
+        answerImage: answerImages[index],
       };
     });
 
@@ -131,6 +148,8 @@ export default function Upload() {
               onClick={(e) => {
                 e.preventDefault();
                 setPreviewimgUrls([]);
+                setPreviewAnswerImgUrls([])
+                setIsNextClicked(false)
                 reset();
                 form.reset();
               }}
@@ -162,55 +181,95 @@ export default function Upload() {
           className="m-4 flex h-fit min-h-full flex-col gap-8 rounded-xl bg-base-100 p-4"
           onSubmit={handleSubmit(onSubmit)}
         >
-          <h2 className="text-3xl">Upload</h2>
+          <h2 className="text-3xl">{`Upload ${isNextClicked?'Answers':'Questions'}`}</h2>
           <input
+            id="image-input"
             className="file-input file-input-bordered h-10 min-h-10 w-80"
             type="file"
             accept="image/*"
             multiple
             onChange={handleFileChange}
           />
-          <div className="flex max-h-full flex-col gap-2 object-contain">
-            {previewImgUrls?.map((previewImgUrl: string, index) => (
-              <div key={previewImgUrl + index} className="flex gap-2">
-                <img
-                  className="max-h-36 w-52 max-w-52 rounded"
-                  src={previewImgUrl}
-                />
-                <div className="flex flex-col">
-                  <label htmlFor="difficulties"></label>
-                  <select
-                    required
-                    id=""
-                    className="h-8 rounded"
-                    {...register(`difficulty.${index}`)}
-                  >
-                    {difficulties.map((difficulty, index2) => (
-                      <option
-                        key={difficulty + index + index2}
-                        value={difficulty}
+          <div className="flex items-center">
+            <div className="flex max-h-full flex-col gap-2 object-contain">
+              {!isNextClicked &&
+                previewImgUrls?.map((previewImgUrl: string, index) => (
+                  <div key={previewImgUrl + index} className="flex gap-2">
+                    <img
+                      className="max-h-36 w-52 max-w-52 rounded"
+                      src={previewImgUrl}
+                    />
+                    <div className="flex flex-col">
+                      <label htmlFor="difficulties"></label>
+                      <select
+                        required
+                        id=""
+                        className="h-8 rounded"
+                        {...register(`difficulty.${index}`)}
                       >
-                        {difficulty}
-                      </option>
+                        {difficulties.map((difficulty, index2) => (
+                          <option
+                            key={difficulty + index + index2}
+                            value={difficulty}
+                          >
+                            {difficulty}
+                          </option>
+                        ))}
+                      </select>
+                      <AutoCompleteSearch
+                        tags={query?.data ?? ["error loading tags"]}
+                        index={index}
+                        setValue={setValue}
+                        key={previewImgUrl + index}
+                      />
+                    </div>
+                  </div>
+                ))}
+              {isNextClicked && (
+                <div className="flex gap-4">
+                  <div className="flex flex-col gap-2">
+                    {previewImgUrls?.map((previewImgUrl: string, index) => (
+                      <div key={previewImgUrl + index} className="flex gap-2">
+                        <img
+                          className="max-h-36 w-52 max-w-52 rounded"
+                          src={previewImgUrl}
+                        />
+                      </div>
                     ))}
-                  </select>
-                  <AutoCompleteSearch
-                    tags={query?.data ?? ["error loading tags"]}
-                    index={index}
-                    setValue={setValue}
-                    key={previewImgUrl + index}
-                  />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {previewAnswerImgUrls?.map(
+                      (previewImgUrl: string, index) => (
+                        <div key={previewImgUrl + index} className="flex gap-2">
+                          <img
+                            className="max-h-36 w-52 max-w-52 rounded"
+                            src={previewImgUrl}
+                          />
+                        </div>
+                      ),
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              )}
+            </div>
           </div>
-          {(previewImgUrls?.length ?? 0) > 0 && (
-            <button
-              className={`btn btn-primary btn-lg mt-10 ${ selectedTags?.every((tags)=>tags.length>0)? "" : "btn-disabled"} relative bottom-4 w-[20%] self-center rounded-lg`}
-            >
-              Upload
-            </button>
-          )}
+          {(previewImgUrls?.length ?? 0) > 0 &&
+            (!isNextClicked ? (
+              <a
+                className={`btn btn-primary btn-lg mt-10 ${selectedTags?.every((tags) => tags.length > 0) ? "" : "btn-disabled"} relative bottom-4 w-[20%] self-center rounded-lg`}
+                onClick={handleNext}
+              >
+                Next
+              </a>
+            ) : (
+              (previewAnswerImgUrls?.length ?? 0) > 0 && (
+                <button
+                  className={`btn btn-primary btn-lg relative bottom-4 mt-10 w-[20%] self-center rounded-lg ${previewAnswerImgUrls?.length === previewImgUrls?.length ? "" : "btn-disabled"}`}
+                >
+                  Upload
+                </button>
+              )
+            ))}
         </form>
       )}
     </>

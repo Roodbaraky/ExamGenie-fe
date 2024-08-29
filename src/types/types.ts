@@ -4,6 +4,7 @@ export interface UploadFormValues {
     difficulty: string[];
     tags: string[][];
     images: string[];
+    answerImages:string[];
   }
   export interface Tag {
     id: number;

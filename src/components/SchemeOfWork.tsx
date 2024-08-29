@@ -35,7 +35,7 @@ export default function SchemeOfWork({
 }: SchemeOfWorkProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [localWeeks, setLocalWeeks] = useState<Week[]>([]);
-  const { token } = useAuth();
+  const { token, user_role } = useAuth();
   const currentWeek = watch("currentWeek");
   const recallPeriod = watch("recallPeriod");
   const className = watch("className");
@@ -132,7 +132,7 @@ export default function SchemeOfWork({
     <div className="flex h-full max-h-full w-full max-w-[45vw] flex-grow flex-col self-center">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-2xl">Scheme of Work</h2>
-        {isSuccess && localWeeks.length > 0 && (
+        {isSuccess && localWeeks.length > 0 && user_role &&(
           <div>
             {isEditing ? (
               isPending ? (
@@ -202,7 +202,7 @@ export default function SchemeOfWork({
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className={`btn ${isEditing ? "cursor-grab" : "cursor-default"}`}
+                            className={`badge  h-8 min-w-fit ${isEditing ? "cursor-grab outline outline-1" : "cursor-default "}`}
                           >
                             {tag.replace(/-/g, " ")}
                           </a>
