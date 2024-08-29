@@ -84,6 +84,13 @@ export default function SchemeOfWork({
   });
 
   const handleSave = async () => {
+    const warning = document.getElementById("weeks-warning") as HTMLDivElement;
+    if (!weeks.every((week) => week?.tags?.length > 0)) {
+      console.error("Cannot save with empty weeks");
+      warning.classList.replace("opacity-0", "opacity-100");
+      return;
+    }
+    warning.classList.replace("opacity-100", "opacity-0");
     try {
       await mutateAsync({ className, weeks: localWeeks });
       setIsEditing(false);
@@ -119,9 +126,16 @@ export default function SchemeOfWork({
                   <span className="loading loading-spinner"></span>
                 </a>
               ) : (
-                <a onClick={handleSave} className="btn btn-primary">
-                  Save
-                </a>
+                <>
+                  <div
+                    id="weeks-warning"
+                    className="tooltip tooltip-left tooltip-open opacity-0"
+                    data-tip="Cannot save with empty weeks"
+                  ></div>
+                  <a onClick={handleSave} className="btn btn-primary">
+                    Save
+                  </a>
+                </>
               )
             ) : (
               <a

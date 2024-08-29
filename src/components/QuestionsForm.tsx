@@ -76,7 +76,6 @@ export default function QuestionsForm() {
     mutationFn: async (data: FormValues) => {
       let apiURL = `${API_URL}/questions`;
       if (+data.quantity >= 1) apiURL += `?limit=${data.quantity}`;
-
       const response = await fetch(apiURL, {
         method: "POST",
         headers: {
