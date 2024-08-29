@@ -114,24 +114,17 @@ export default function SchemeOfWork({
     (result: DropResult) => {
       if (!result.destination) return;
       const { source, destination } = result;
-  
-    
       const newWeeks = localWeeks.map(week => ({
         ...week,
         tags: [...week.tags],
       }));
-  
       const sourceIndex = parseInt(source.droppableId, 10);
       const destIndex = parseInt(destination.droppableId, 10);
-  
-    
       const [reorderedTag] = newWeeks[sourceIndex].tags.splice(source.index, 1);
       newWeeks[destIndex].tags.splice(destination.index, 0, reorderedTag);
-  
       setLocalWeeks(newWeeks);
-      console.log(weeks, localWeeks);
     },
-    [localWeeks, weeks],
+    [localWeeks],
   );
   
 
