@@ -91,7 +91,7 @@ export default function SchemeOfWork({
   };
   const handleSave = async () => {
     const warning = document.getElementById("weeks-warning") as HTMLDivElement;
-    if (!weeks.every((week) => week?.tags?.length > 0)) {
+    if (!localWeeks.every((week) => week?.tags?.length > 0)) {
       console.error("Cannot save with empty weeks");
       warning.classList.replace("opacity-0", "opacity-100");
       return;
