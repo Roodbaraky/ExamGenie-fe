@@ -15,7 +15,7 @@ import PDFFile from "./PDFFile";
 import QuantitySelector from "./QuantitySelector";
 import RecallPeriodSelector from "./RecallPeriodSelector";
 import SchemeOfWork from "./SchemeOfWork";
-const API_URL=import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL;
 
 export interface FormValues {
   className: string;
@@ -61,7 +61,6 @@ export default function QuestionsForm() {
     mode: "onChange",
     criteriaMode: "all",
   });
-
   const { register, handleSubmit, setValue, watch, formState } = form;
   const { isValid, isSubmitting } = formState;
   const {
@@ -77,7 +76,6 @@ export default function QuestionsForm() {
     mutationFn: async (data: FormValues) => {
       let apiURL = `${API_URL}/questions`;
       if (+data.quantity >= 1) apiURL += `?limit=${data.quantity}`;
-
       const response = await fetch(apiURL, {
         method: "POST",
         headers: {
@@ -131,6 +129,7 @@ export default function QuestionsForm() {
       }).then((res) => res.json()),
     enabled: !!className,
   });
+
   const isSubmitDisabled =
     !isValid || query?.data?.length === 0 || isSubmitting;
 
@@ -173,9 +172,10 @@ export default function QuestionsForm() {
             watch={watch}
             isLoading={isLoading}
             isSuccess={isSuccess}
+            refetch={query?.refetch}
           />
         </section>
-        {(!isDataSuccess ||isIdle)&& (
+        {(!isDataSuccess || isIdle) && (
           <button
             disabled={isSubmitDisabled}
             className="btn btn-primary btn-lg col-span-2 mx-auto my-auto w-[60%] max-w-64 rounded-lg px-4 py-2 text-3xl"
