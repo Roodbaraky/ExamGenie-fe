@@ -82,7 +82,13 @@ export default function SchemeOfWork({
       };
     },
   });
-
+  const compareWeekTagsArrays = (arr1: Week[], arr2: Week[]) => {
+    return arr1.every((week: Week, index: number) => {
+      const tags1 = week.tags;
+      const tags2 = arr2[index]?.tags;
+      return tags1.every((tag) => tags2.includes(tag));
+    });
+  };
   const handleSave = async () => {
     const warning = document.getElementById("weeks-warning") as HTMLDivElement;
     if (!weeks.every((week) => week?.tags?.length > 0)) {
@@ -91,6 +97,10 @@ export default function SchemeOfWork({
       return;
     }
     warning.classList.replace("opacity-100", "opacity-0");
+    if (compareWeekTagsArrays(weeks, localWeeks)) {
+      setIsEditing(false);
+      return;
+    }
     try {
       await mutateAsync({ className, weeks: localWeeks });
       setIsEditing(false);
@@ -104,15 +114,26 @@ export default function SchemeOfWork({
     (result: DropResult) => {
       if (!result.destination) return;
       const { source, destination } = result;
-      const newWeeks = Array.from(localWeeks);
+  
+    
+      const newWeeks = localWeeks.map(week => ({
+        ...week,
+        tags: [...week.tags],
+      }));
+  
       const sourceIndex = parseInt(source.droppableId, 10);
       const destIndex = parseInt(destination.droppableId, 10);
+  
+    
       const [reorderedTag] = newWeeks[sourceIndex].tags.splice(source.index, 1);
       newWeeks[destIndex].tags.splice(destination.index, 0, reorderedTag);
+  
       setLocalWeeks(newWeeks);
+      console.log(weeks, localWeeks);
     },
-    [localWeeks],
+    [localWeeks, weeks],
   );
+  
 
   return (
     <div className="flex h-full max-h-full w-full max-w-[45vw] flex-grow flex-col self-center">
