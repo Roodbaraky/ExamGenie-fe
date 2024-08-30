@@ -6,6 +6,7 @@ import AutoCompleteSearch from "../components/AutocompleteSearch";
 import Loader from "../components/Loader";
 import { useAuth } from "../hooks/useAuth";
 import { UploadFormValues } from "../types/types";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Upload() {
   const [previewImgUrls, setPreviewimgUrls] = useState<string[]>();
@@ -92,7 +93,7 @@ export default function Upload() {
       };
     });
 
-    const response = await fetch(`http://127.0.0.1:3001/upload`, {
+    const response = await fetch(`${API_URL}/upload`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
