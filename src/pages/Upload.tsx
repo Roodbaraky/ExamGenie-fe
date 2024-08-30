@@ -73,7 +73,7 @@ export default function Upload() {
   const query = useQuery({
     queryKey: ["tags"],
     queryFn: () =>
-      fetch(`http://${API_URL}/tags`, {
+      fetch(`${API_URL}/tags`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
