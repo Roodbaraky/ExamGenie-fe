@@ -73,7 +73,7 @@ export default function Upload() {
   const query = useQuery({
     queryKey: ["tags"],
     queryFn: () =>
-      fetch(`http://127.0.0.1:3001/tags`, {
+      fetch(`http://${API_URL}/tags`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
