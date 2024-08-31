@@ -45,7 +45,7 @@ export default function QuestionsForm() {
     HPA: "Half Page Assessment",
   };
 
-  const { token } = useAuth();
+  const auth = useAuth();
 
   const form = useForm<FormValues>({
     defaultValues: {
@@ -74,6 +74,7 @@ export default function QuestionsForm() {
     reset,
   } = useMutation({
     mutationFn: async (data: FormValues) => {
+      const token = auth.token;
       let apiURL = `${API_URL}/questions`;
       if (+data.quantity >= 1) apiURL += `?limit=${data.quantity}`;
       const response = await fetch(apiURL, {
@@ -115,7 +116,7 @@ export default function QuestionsForm() {
   const onSubmit = async (data: FormValues) => {
     mutate(data);
   };
-
+const token = auth.token
   const className = watch("className");
   const query = useQuery({
     queryKey: [className],
