@@ -35,7 +35,7 @@ export default function SchemeOfWork({
 }: SchemeOfWorkProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [localWeeks, setLocalWeeks] = useState<Week[]>([]);
-  const { token, user_role } = useAuth();
+  const auth = useAuth();
   const currentWeek = watch("currentWeek");
   const recallPeriod = watch("recallPeriod");
   const className = watch("className");
@@ -62,6 +62,7 @@ export default function SchemeOfWork({
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (data: { className: string; weeks: Week[] }) => {
+      const token = auth.token
       const response = await fetch(`${API_URL}/sow`, {
         method: "POST",
         headers: {
@@ -132,7 +133,7 @@ export default function SchemeOfWork({
     <div className="flex h-full max-h-full w-full max-w-[45vw] flex-grow flex-col self-center">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-2xl">Scheme of Work</h2>
-        {isSuccess && localWeeks.length > 0 && user_role &&(
+        {isSuccess && localWeeks.length > 0 && auth.user_role &&(
           <div>
             {isEditing ? (
               isPending ? (
