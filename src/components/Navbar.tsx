@@ -8,12 +8,12 @@ export const Navbar = () => {
   return (
     <nav className="grid grid-cols-3 bg-secondary p-2 drop-shadow-md">
     <h1
-      className="col-span-1 col-start-1 h-fit w-fit cursor-pointer self-start rounded-xl text-start text-7xl hover:drop-shadow-xl"
+      className="col-span-1 col-start-1 h-fit w-fit cursor-pointer self-start rounded-xl text-start text-5xl hover:drop-shadow-xl"
       onClick={() => {
         navigate("/");
       }}
     >
-      ExamGenie
+      Recall - Prototype
     </h1>
     {session && (
       <div className="col-start-3 flex items-end gap-2 self-center justify-self-end">
