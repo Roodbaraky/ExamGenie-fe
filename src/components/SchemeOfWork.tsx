@@ -38,6 +38,7 @@ export default function SchemeOfWork({
   const [localWeeks, setLocalWeeks] = useState<Week[]>([]);
   const [activeWeek, setActiveWeek] = useState<number | null>(null);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const [isDeleteVisible, setIsDeleteVisible] = useState(true);
 
   const auth = useAuth();
   const currentWeek = watch("currentWeek");
@@ -129,6 +130,7 @@ export default function SchemeOfWork({
   };
   const onDragStart = useCallback(() => {
     setIsDropdownVisible(false);
+    setIsDeleteVisible(false)
   }, []);
   const onDragEnd = useCallback(
     (result: DropResult) => {
@@ -143,6 +145,7 @@ export default function SchemeOfWork({
       const [reorderedTag] = newWeeks[sourceIndex].tags.splice(source.index, 1);
       newWeeks[destIndex].tags.splice(destination.index, 0, reorderedTag);
       setLocalWeeks(newWeeks);
+      setIsDeleteVisible(true)
     },
     [localWeeks],
   );
@@ -269,7 +272,7 @@ export default function SchemeOfWork({
                               >
                                 {tag.replace(/-/g, " ")}
                               </a>
-                              {isEditing && (
+                              {isEditing && isDeleteVisible && (
                                 <a
                                   id={`${weekIndex}-${index}`}
                                   className="badge indicator-item badge-secondary cursor-pointer"
@@ -301,7 +304,7 @@ export default function SchemeOfWork({
                       </a>
                     </>
                   ) : (
-                    <a className="btn" onClick={handleAdd} id={`${weekIndex}`}>
+                    isDeleteVisible&&<a className="btn" onClick={handleAdd} id={`${weekIndex}`}>
                       +
                     </a>
                   ))}
