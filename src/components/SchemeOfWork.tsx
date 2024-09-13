@@ -130,6 +130,7 @@ export default function SchemeOfWork({
 
   const onDragEnd = useCallback(
     (result: DropResult) => {
+      setIsDropdownVisible(false)
       if (!result.destination) return;
       const { source, destination } = result;
       const newWeeks = localWeeks.map((week) => ({
