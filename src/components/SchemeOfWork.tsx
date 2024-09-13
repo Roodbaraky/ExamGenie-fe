@@ -134,6 +134,7 @@ export default function SchemeOfWork({
   }, []);
   const onDragEnd = useCallback(
     (result: DropResult) => {
+      setIsDeleteVisible(true)
       if (!result.destination) return;
       const { source, destination } = result;
       const newWeeks = localWeeks.map((week) => ({
@@ -145,7 +146,6 @@ export default function SchemeOfWork({
       const [reorderedTag] = newWeeks[sourceIndex].tags.splice(source.index, 1);
       newWeeks[destIndex].tags.splice(destination.index, 0, reorderedTag);
       setLocalWeeks(newWeeks);
-      setIsDeleteVisible(true)
     },
     [localWeeks],
   );
