@@ -127,10 +127,11 @@ export default function SchemeOfWork({
       console.error("Error updating backend:", error);
     }
   };
-
+  const onDragStart = useCallback(() => {
+    setIsDropdownVisible(false);
+  }, []);
   const onDragEnd = useCallback(
     (result: DropResult) => {
-      setIsDropdownVisible(false)
       if (!result.destination) return;
       const { source, destination } = result;
       const newWeeks = localWeeks.map((week) => ({
@@ -217,7 +218,7 @@ export default function SchemeOfWork({
           </div>
         )}
       </div>
-      <DragDropContext onDragEnd={onDragEnd}>
+      <DragDropContext onDragEnd={onDragEnd} onDragStart={onDragStart}>
         <div className="h-full max-h-full w-full overflow-scroll rounded-xl p-4">
           {isSuccess && localWeeks.length > 0 ? (
             localWeeks.map((week, weekIndex) => (
