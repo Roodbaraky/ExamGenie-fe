@@ -1,8 +1,8 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, MouseEvent } from "react";
 import { UseFormWatch } from "react-hook-form";
 import { FormValues } from "./QuestionsForm";
 import SchemeOfWorkSkeleton from "./SchemeOfWorkSkeleton";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useAuth } from "../hooks/useAuth";
 import {
   DragDropContext,
@@ -10,6 +10,7 @@ import {
   Draggable,
   DropResult,
 } from "react-beautiful-dnd";
+import { Tag } from "../types/types";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -35,6 +36,9 @@ export default function SchemeOfWork({
 }: SchemeOfWorkProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [localWeeks, setLocalWeeks] = useState<Week[]>([]);
+  const [activeWeek, setActiveWeek] = useState<number | null>(null);
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
   const auth = useAuth();
   const currentWeek = watch("currentWeek");
   const recallPeriod = watch("recallPeriod");
@@ -62,7 +66,7 @@ export default function SchemeOfWork({
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (data: { className: string; weeks: Week[] }) => {
-      const token = auth.token
+      const token = auth.token;
       const response = await fetch(`${API_URL}/sow`, {
         method: "POST",
         headers: {
@@ -83,6 +87,19 @@ export default function SchemeOfWork({
       };
     },
   });
+
+  const query = useQuery({
+    queryKey: ["tags"],
+    queryFn: () =>
+      fetch(`${API_URL}/tags`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth.token}`,
+        },
+      }).then((res) => res.json()),
+  });
+
   const compareWeekTagsArrays = (arr1: Week[], arr2: Week[]) => {
     return arr1.every((week: Week, index: number) => {
       const tags1 = week.tags;
@@ -115,7 +132,7 @@ export default function SchemeOfWork({
     (result: DropResult) => {
       if (!result.destination) return;
       const { source, destination } = result;
-      const newWeeks = localWeeks.map(week => ({
+      const newWeeks = localWeeks.map((week) => ({
         ...week,
         tags: [...week.tags],
       }));
@@ -127,13 +144,49 @@ export default function SchemeOfWork({
     },
     [localWeeks],
   );
-  
+  const handleAdd = (e: MouseEvent) => {
+    const weekNumber = +(e.target as HTMLAnchorElement).id;
+    setActiveWeek(weekNumber);
+    setIsDropdownVisible(true);
+  };
+
+  const handleAddTag = () => {
+    const newTag = (
+      document.getElementById("tag-selector") as HTMLSelectElement
+    ).value;
+    const newWeeks = localWeeks.map((week, index) => {
+      if (index === activeWeek) {
+        return {
+          ...week,
+          tags: [...week.tags, newTag],
+        };
+      }
+      return week;
+    });
+    setLocalWeeks(newWeeks);
+  };
+
+  const handleRemoveTag = (e: MouseEvent) => {
+    const delId = (e.target as HTMLAnchorElement).id;
+    const [weekIndex, tagIndex] = delId.split("-");
+    const newWeeks = localWeeks.map((week, index) => {
+      if (index === +weekIndex) {
+        const newTags = week.tags.filter((_, tagIdx) => tagIdx !== +tagIndex);
+        return {
+          ...week,
+          tags: newTags,
+        };
+      }
+      return week;
+    });
+    setLocalWeeks(newWeeks);
+  };
 
   return (
     <div className="flex h-full max-h-full w-full max-w-[45vw] flex-grow flex-col self-center">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-2xl">Scheme of Work</h2>
-        {isSuccess && localWeeks.length > 0 && auth.user_role &&(
+        {isSuccess && localWeeks.length > 0 && auth.user_role && (
           <div>
             {isEditing ? (
               isPending ? (
@@ -167,53 +220,90 @@ export default function SchemeOfWork({
         <div className="h-full max-h-full w-full overflow-scroll rounded-xl p-4">
           {isSuccess && localWeeks.length > 0 ? (
             localWeeks.map((week, weekIndex) => (
-              <Droppable
+              <div
+                className="flex flex-wrap items-center"
                 key={`week-${week.week_number}`}
-                droppableId={weekIndex.toString()}
               >
-                {(provided) => (
-                  <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className="flex flex-nowrap gap-4 p-1"
-                  >
-                    <div id={`week-${week.week_number}`}>
-                      <p
-                        className={`p-1 ${
-                          week.week_number === +currentWeek
-                            ? "badge-success rounded-full"
-                            : week.week_number >= +currentWeek - recallPeriod &&
-                                week.week_number < +currentWeek
-                              ? "rounded-full backdrop-brightness-90"
-                              : ""
-                        } w-fit text-nowrap`}
-                      >
-                        Week {week.week_number}:
-                      </p>
+                <Droppable
+                  className="w-fit"
+                  key={`week-${week.week_number}`}
+                  droppableId={weekIndex.toString()}
+                >
+                  {(provided) => (
+                    <div
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      className="flex flex-nowrap gap-4 p-1"
+                    >
+                      <div id={`week-${week.week_number}`}>
+                        <p
+                          className={`p-1 ${
+                            week.week_number === +currentWeek
+                              ? "badge-success rounded-full"
+                              : week.week_number >=
+                                    +currentWeek - recallPeriod &&
+                                  week.week_number < +currentWeek
+                                ? "rounded-full backdrop-brightness-90"
+                                : ""
+                          } w-fit text-nowrap`}
+                        >
+                          Week {week.week_number}:
+                        </p>
+                      </div>
+                      {week.tags.map((tag, index) => (
+                        <Draggable
+                          key={`${week.week_number}-${tag}`}
+                          draggableId={`${week.week_number}-${tag}`}
+                          index={index}
+                          isDragDisabled={!isEditing}
+                        >
+                          {(provided) => (
+                            <div className="indicator">
+                              <a
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                className={`badge h-8 min-w-fit ${isEditing ? "cursor-grab outline outline-1" : "cursor-default"}`}
+                              >
+                                {tag.replace(/-/g, " ")}
+                              </a>
+                              {isEditing && (
+                                <a
+                                  id={`${weekIndex}-${index}`}
+                                  className="badge indicator-item badge-secondary cursor-pointer"
+                                  onClick={handleRemoveTag}
+                                >
+                                  x
+                                </a>
+                              )}
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
                     </div>
-                    {week.tags.map((tag, index) => (
-                      <Draggable
-                        key={`${week.week_number}-${tag}`}
-                        draggableId={`${week.week_number}-${tag}`}
-                        index={index}
-                        isDragDisabled={!isEditing}
-                      >
-                        {(provided) => (
-                          <a
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className={`badge  h-8 min-w-fit ${isEditing ? "cursor-grab outline outline-1" : "cursor-default "}`}
-                          >
-                            {tag.replace(/-/g, " ")}
-                          </a>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
+                  )}
+                </Droppable>
+                {isEditing &&
+                  (isDropdownVisible && activeWeek === weekIndex ? (
+                    <>
+                      <select id="tag-selector">
+                        {query.data?.map((tag: Tag) => (
+                          <option key={`${weekIndex}-${tag.tag}`}>
+                            {tag.tag}
+                          </option>
+                        ))}
+                      </select>
+                      <a className="btn" onClick={handleAddTag}>
+                        Add
+                      </a>
+                    </>
+                  ) : (
+                    <a className="btn" onClick={handleAdd} id={`${weekIndex}`}>
+                      +
+                    </a>
+                  ))}
+              </div>
             ))
           ) : !isLoading ? (
             <div className="flex h-full flex-col items-center justify-center self-center text-center">
