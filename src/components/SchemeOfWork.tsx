@@ -230,7 +230,6 @@ export default function SchemeOfWork({
                 key={`week-${week.week_number}`}
               >
                 <Droppable
-                  className="w-fit"
                   key={`week-${week.week_number}`}
                   droppableId={weekIndex.toString()}
                 >
