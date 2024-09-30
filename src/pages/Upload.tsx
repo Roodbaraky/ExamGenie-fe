@@ -13,7 +13,7 @@ export default function Upload() {
   const [previewAnswerImgUrls, setPreviewAnswerImgUrls] = useState<string[]>();
   const [isNextClicked, setIsNextClicked] = useState<boolean>(false);
 
-  const difficulties = ["foundation", "crossover", "higher", "crossover"];
+  const difficulties = ["foundation", "crossover", "higher", "extended"];
   const { token } = useAuth();
   const navigate = useNavigate();
 

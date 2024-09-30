@@ -81,7 +81,8 @@ export default function SchemeOfWork({
         throw new Error(`${response.status}: ${response.statusText}`);
       }
 
-      const result = await response.json();
+      const result = await response?.json();
+      if(result)console.log(result)
       return {
         sow_id: result.sow_id,
         weeks: result.weeks,
