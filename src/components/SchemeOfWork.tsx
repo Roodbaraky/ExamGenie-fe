@@ -65,6 +65,9 @@ export default function SchemeOfWork({
     }
   }, [currentWeek]);
 
+  useEffect(() => {
+    setIsEditing(false);
+  }, [className]);
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (data: { className: string; weeks: Week[] }) => {
       const token = auth.token;
@@ -82,7 +85,7 @@ export default function SchemeOfWork({
       }
 
       const result = await response?.json();
-      if(result)console.log(result)
+      if (result) console.log(result);
       return {
         sow_id: result.sow_id,
         weeks: result.weeks,
@@ -131,11 +134,11 @@ export default function SchemeOfWork({
   };
   const onDragStart = useCallback(() => {
     setIsDropdownVisible(false);
-    setIsDeleteVisible(false)
+    setIsDeleteVisible(false);
   }, []);
   const onDragEnd = useCallback(
     (result: DropResult) => {
-      setIsDeleteVisible(true)
+      setIsDeleteVisible(true);
       if (!result.destination) return;
       const { source, destination } = result;
       const newWeeks = localWeeks.map((week) => ({
@@ -304,9 +307,15 @@ export default function SchemeOfWork({
                       </a>
                     </>
                   ) : (
-                    isDeleteVisible&&<a className="btn" onClick={handleAdd} id={`${weekIndex}`}>
-                      +
-                    </a>
+                    isDeleteVisible && (
+                      <a
+                        className="btn"
+                        onClick={handleAdd}
+                        id={`${weekIndex}`}
+                      >
+                        +
+                      </a>
+                    )
                   ))}
               </div>
             ))
