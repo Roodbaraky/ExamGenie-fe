@@ -13,7 +13,7 @@ ExamGenie is a study tool designed to help students practice past papers efficie
 
 - **User Authentication**: Secure sign-up and login functionality.
 - **Search and Filter**: Easily search and filter past papers by tag and difficulty level.
-- **Responsive Design**: Fully responsive layout for seamless use on desktops, tablets, and mobile devices.
+- **Upload Questions**: Upload new question and answer sets to query with the search tool.
 
 ## Technologies Used
 
